@@ -1,0 +1,36 @@
+{
+	admin off
+	persist_config off
+	auto_https off
+	log {
+		format json
+	}
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+:{$PORT:80} {
+	log {
+		format json
+	}
+
+	respond /health 200
+
+	# MediaPipe (Kim chiqadi?) WebAssembly ishlatadi — shuning uchun
+	# Railway'ning standart qattiq CSP sarlavhasi bu yerda qo'yilmaydi.
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	root * .
+	encode gzip zstd
+
+	file_server {
+		hide .git .env* Caddyfile ishga-tushirish.bat
+	}
+
+	try_files {path} {path}.html {path}/index.html
+}
