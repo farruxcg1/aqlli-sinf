@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sinflar reytingi — Aqlli sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d1630;--panel:#1a2747;--panel2:#24345c;--line:#33467a;--text:#f4f6ff;--muted:#a9b4d6;--yellow:#ffc53d;--gold:#ffcf40;--silver:#c9d3e6;--bronze:#e0995e;--teal:#2fd3b5}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:radial-gradient(ellipse at 50% -20%,#25407a 0%,var(--bg) 60%);color:var(--text);font-family:Nunito,system-ui,sans-serif;overflow:hidden;user-select:none}
+  button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding:clamp(10px,1.4vw,22px) clamp(14px,2vw,32px)}
+  header{display:flex;align-items:center;gap:16px}
+  .iconbtn{width:56px;height:56px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:24px;display:grid;place-items:center;text-decoration:none;color:inherit}
+  .tv header .iconbtn{opacity:.25}
+  h1{font-size:clamp(26px,3vw,54px);font-weight:900;line-height:1}
+  h1 span{color:var(--yellow)}
+  .sub{color:var(--muted);font-weight:800;font-size:clamp(14px,1.3vw,22px);margin-top:4px}
+  .spacer{flex:1}
+  .clock{text-align:right;font-weight:900;font-size:clamp(28px,3vw,56px);line-height:1}
+  .clock small{display:block;font-size:.4em;color:var(--muted);font-weight:800}
+
+  .stage{position:relative;flex:1;min-height:0;margin-top:clamp(8px,1.2vw,18px)}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateX(40px);transition:opacity .6s,transform .6s;pointer-events:none}
+  .slide.on{opacity:1;transform:none;pointer-events:auto}
+  .stitle{text-align:center;font-size:clamp(28px,3.4vw,64px);font-weight:900}
+  .stitle small{display:block;font-size:.42em;color:var(--muted);font-weight:800}
+
+  /* shohsupa */
+  .podium{flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center;gap:clamp(12px,2vw,40px);padding-top:10px}
+  .col{display:flex;flex-direction:column;align-items:center;width:min(26vw,360px)}
+  .col .cls{font-size:clamp(40px,5.6vw,110px);font-weight:900;line-height:1}
+  .col .val{font-size:clamp(16px,1.6vw,28px);font-weight:800;color:var(--muted);margin:4px 0 10px}
+  .col .val b{color:var(--text)}
+  .col .crown{font-size:clamp(34px,4vw,72px);line-height:1;animation:bob 2s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-8px)}}
+  .block{width:100%;border-radius:22px 22px 0 0;display:grid;place-items:start center;padding-top:clamp(10px,1.4vw,24px);font-size:clamp(46px,6vw,120px);font-weight:900;color:rgba(0,0,0,.45);box-shadow:inset 0 -12px 0 rgba(0,0,0,.15)}
+  .p1 .block{background:linear-gradient(180deg,#ffe07a,var(--gold));height:clamp(140px,34vh,380px)}
+  .p2 .block{background:linear-gradient(180deg,#eef2fa,var(--silver));height:clamp(100px,24vh,280px)}
+  .p3 .block{background:linear-gradient(180deg,#f2b98a,var(--bronze));height:clamp(70px,17vh,200px)}
+  .rest{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .rest span{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:6px 18px;font-weight:900;font-size:clamp(16px,1.5vw,26px)}
+  .growth{color:var(--teal)}
+
+  /* nominatsiyalar */
+  .noms{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:clamp(10px,1.4vw,22px);align-content:center;padding-top:14px}
+  .nom{background:var(--panel);border:3px solid var(--line);border-radius:28px;padding:clamp(14px,1.6vw,26px);display:flex;align-items:center;gap:clamp(12px,1.4vw,22px)}
+  .nom .ic{font-size:clamp(48px,5vw,96px);line-height:1}
+  .nom .t{font-size:clamp(16px,1.5vw,26px);font-weight:800;color:var(--muted)}
+  .nom .w{font-size:clamp(34px,3.8vw,72px);font-weight:900;line-height:1.05}
+  .nom .v{font-size:clamp(14px,1.2vw,20px);font-weight:800;color:var(--muted)}
+
+  .dots{display:flex;gap:10px;justify-content:center;margin-top:8px}
+  .dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}
+  .dots i.on{background:var(--yellow)}
+  .empty{flex:1;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:clamp(22px,2.4vw,40px);font-weight:800}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="iconbtn" href="index.html" title="Bosh sahifa">🏠</a>
+    <div><h1>🏆 Sinflar <span>reytingi</span></h1><div class="sub" id="sub"></div></div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="btnFull" title="To'liq ekran">⛶</button>
+    <div class="clock" id="clock"></div>
+  </header>
+  <div class="stage" id="stage"></div>
+  <div class="dots" id="dots"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+const $=id=>document.getElementById(id), S=AqlliStore, esc=AqlliUI.esc;
+const OY=["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"];
+const params=new URLSearchParams(location.search);
+if(params.has("tv")) document.body.classList.add("tv");   // reyting.html?tv — koridor televizori uchun
+let slides=[], idx=0, rotT=null, data=null, schoolName="";
+
+function fmt(v){ return (Math.round(v*10)/10).toLocaleString("uz-UZ"); }
+function weekLabel(ws){ const e=new Date(ws); e.setDate(e.getDate()+6); return `${ws.getDate()}-${OY[ws.getMonth()]} — ${e.getDate()}-${OY[e.getMonth()]}`; }
+
+function podium(g){
+  const top=g.classes.slice(0,3), rest=g.classes.slice(3);
+  const order=[top[1],top[0],top[2]].map((c,i)=>c?{c,p:[2,1,3][i]}:null).filter(Boolean);
+  return `<div class="slide"><div class="stitle">${g.grade}-sinflar<small>bitta o'quvchiga o'rtacha ball · shu hafta</small></div>
+    <div class="podium">${order.map(({c,p})=>`<div class="col p${p}">
+      ${p===1?'<div class="crown">👑</div>':""}
+      <div class="cls">${esc(c.name)}</div>
+      <div class="val"><b>${fmt(c.avg)}</b> ball${c.growth>0?` · <span class="growth">▲ ${fmt(c.growth)}</span>`:""}</div>
+      <div class="block">${p}</div></div>`).join("")}</div>
+    ${rest.length?`<div class="rest">${rest.map((c,i)=>`<span>${i+4}. ${esc(c.name)} · ${fmt(c.avg)}</span>`).join("")}</div>`:""}</div>`;
+}
+function best(list,key,min=0.01){ const s=[...list].sort((a,b)=>b[key]-a[key]); return s[0]&&s[0][key]>=min?s[0]:null; }
+// Nominatsiyalar faqat parallel sinflar ichida (F9.3, 1-qoida)
+function nominations(g){
+  const list=g.classes; if(list.length<2) return "";
+  const n=[
+    ["📈","Eng ko'p o'sgan sinf", best(list,"growth"), c=>`o'tgan haftadan +${fmt(c.growth)}`],
+    ["🧮","Matematika chempionlari", best(list,"math"), c=>`${fmt(c.math)} ball / o'quvchi`],
+    ["🌍","Bilimdonlar sinfi", best(list,"wheel"), c=>`${fmt(c.wheel)} ball / o'quvchi`],
+    ["📅","Eng yaxshi davomat", best(list,"attendance"), c=>`${c.attendance/5} kun hamma keldi`],
+  ].filter(x=>x[2]);
+  if(!n.length) return "";
+  return `<div class="slide"><div class="stitle">⭐ ${g.grade}-sinflar: haftaning nominatsiyalari<small>parallel sinflar o'rtasida</small></div>
+    <div class="noms">${n.map(([i,t,c,v])=>`<div class="nom"><div class="ic">${i}</div><div><div class="t">${t}</div><div class="w">${esc(c.name)}</div><div class="v">${v(c)}</div></div></div>`).join("")}</div></div>`;
+}
+function totalSlide(list){
+  const stars=list.reduce((a,c)=>a+c.stars,0), pts=list.reduce((a,c)=>a+c.points,0);
+  return `<div class="slide"><div class="stitle">🎉 Bu hafta maktabimiz<small>barcha sinflar birgalikda</small></div>
+    <div class="noms"><div class="nom"><div class="ic">⭐</div><div><div class="t">yulduz yig'ildi</div><div class="w">${stars}</div></div></div>
+    <div class="nom"><div class="ic">🎯</div><div><div class="t">umumiy ball</div><div class="w">${pts}</div></div></div>
+    <div class="nom"><div class="ic">🏫</div><div><div class="t">sinf qatnashmoqda</div><div class="w">${list.filter(c=>c.points>0).length}</div></div></div></div></div>`;
+}
+
+async function refresh(){
+  try{ data=await S.ranking(); }catch(e){ console.error(e); return; }
+  $("sub").textContent=`${schoolName?schoolName+" · ":""}${weekLabel(data.weekStart)}`;
+  const g=params.get("grade");
+  const grades=data.grades.filter(x=>x.classes.length>=1&&(!g||String(x.grade)===g));
+  let html=grades.map(x=>podium(x)+nominations(x)).join("")+(g?"":totalSlide(data.list));
+  if(!html) html=`<div class="slide"><div class="empty">Hali ballar yo'q.<br>"Sinf daftari"da yulduz bering yoki o'yin o'ynang!</div></div>`;
+  const keep=idx;
+  $("stage").innerHTML=html;
+  slides=[...$("stage").querySelectorAll(".slide")];
+  idx=Math.min(keep,slides.length-1); show(idx);
+}
+function show(i){
+  slides.forEach((s,k)=>s.classList.toggle("on",k===i));
+  $("dots").innerHTML=slides.length>1?slides.map((s,k)=>`<i class="${k===i?"on":""}"></i>`).join(""):"";
+}
+function rotate(){ clearInterval(rotT); rotT=setInterval(()=>{ if(slides.length>1){ idx=(idx+1)%slides.length; show(idx); } },12000); }
+$("stage").addEventListener("click",()=>{ if(slides.length>1){ idx=(idx+1)%slides.length; show(idx); rotate(); } });
+$("btnFull").onclick=()=>{ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{}); };
+function clock(){ const d=new Date(); $("clock").innerHTML=`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}<small>${d.getDate()}-${OY[d.getMonth()]}</small>`; }
+clock(); setInterval(clock,10000);
+
+(async()=>{
+  await AqlliUI.ensureReady();
+  try{ schoolName=(await S.school()).name; }catch(e){}
+  await refresh(); rotate();
+  let tm; S.onChange(()=>{ clearTimeout(tm); tm=setTimeout(refresh,800); });
+  setInterval(refresh,60000);
+})();
+</script>
+</body>
+</html>

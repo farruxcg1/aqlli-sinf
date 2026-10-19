@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Savollar barabani — Aqlli sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101a33; --panel:#1a2747; --panel2:#24345c; --line:#33467a;
+    --text:#f4f6ff; --muted:#a9b4d6; --yellow:#ffc53d;
+    --ok:#3ddc84; --bad:#ff4d4d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:Nunito,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  header{display:flex;align-items:center;gap:14px;padding:10px 20px}
+  header h1{font-size:clamp(22px,2.4vw,38px);font-weight:900}
+  header h1 span{color:var(--yellow)}
+  .spacer{flex:1}
+  .iconbtn{width:58px;height:58px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:26px;display:grid;place-items:center;text-decoration:none;color:inherit}
+  .iconbtn:active{transform:scale(.95)}
+
+  main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);gap:20px;padding:0 20px 20px}
+  .wheelbox{position:relative;display:grid;place-items:center;min-height:0}
+  .wheelbox svg{width:100%;height:100%;max-height:100%;display:block}
+  #wheel{transform-origin:210px 222px;transform-box:view-box}
+  #pointer{transform-origin:210px 20px;transform-box:view-box;transition:transform .08s}
+  #pointer.tick{transform:rotate(-14deg)}
+  .hub{cursor:pointer}
+
+  .side{display:flex;flex-direction:column;gap:16px;min-height:0}
+  .card{background:var(--panel);border:3px solid var(--line);border-radius:26px;padding:clamp(14px,1.6vw,24px)}
+  .spin{width:100%;min-height:clamp(84px,13vh,130px);border-radius:26px;background:var(--yellow);color:#1b1b1b;font-size:clamp(28px,3vw,52px);font-weight:900;box-shadow:0 8px 0 #c9921a}
+  .spin:active{transform:translateY(5px);box-shadow:0 3px 0 #c9921a}
+  .spin:disabled{opacity:.55;transform:none}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+  .stats div{background:var(--bg);border-radius:18px;padding:10px 6px;font-weight:800;color:var(--muted);font-size:clamp(14px,1.2vw,18px)}
+  .stats b{display:block;font-size:clamp(30px,3vw,52px);font-weight:900;color:var(--text);line-height:1.1}
+  .stats .g b{color:var(--ok)} .stats .r b{color:var(--bad)}
+  .cats{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
+  .cat{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;background:var(--bg);font-weight:800;font-size:clamp(14px,1.2vw,19px)}
+  .cat i{width:14px;height:14px;border-radius:50%;flex:none}
+  .cat span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cat em{font-style:normal;color:var(--muted)}
+  .cat.done{opacity:.4;text-decoration:line-through}
+  .small{display:flex;gap:10px}
+  .small button{flex:1;min-height:56px;border-radius:16px;background:var(--panel2);border:2px solid var(--line);font-weight:900;font-size:clamp(16px,1.4vw,22px)}
+
+  /* Savol oynasi */
+  .overlay{position:fixed;inset:0;background:rgba(8,13,28,.82);display:none;place-items:center;z-index:10;padding:20px}
+  .overlay.show{display:grid}
+  .qcard{width:min(1300px,96vw);max-height:94vh;overflow:auto;background:var(--panel);border:4px solid var(--line);border-radius:34px;padding:clamp(20px,3vw,44px);animation:pop .45s ease-out both}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
+  .chip{display:inline-flex;align-items:center;gap:10px;padding:8px 20px;border-radius:999px;font-size:clamp(18px,1.8vw,28px);font-weight:900;color:#14182b}
+  .qtext{font-size:clamp(30px,3.6vw,64px);font-weight:900;line-height:1.15;margin:18px 0 26px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .opt{display:flex;align-items:center;gap:16px;text-align:left;min-height:clamp(76px,11vh,120px);padding:12px 20px;border-radius:22px;background:var(--panel2);border:3px solid var(--line);font-size:clamp(22px,2.3vw,40px);font-weight:900;box-shadow:0 6px 0 rgba(0,0,0,.3)}
+  .opt:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+  .opt b{flex:none;width:clamp(44px,4vw,64px);height:clamp(44px,4vw,64px);border-radius:16px;background:var(--bg);display:grid;place-items:center;color:var(--yellow)}
+  .opt.right{background:var(--ok);border-color:#24b765;color:#06331a}
+  .opt.right b{background:#fff;color:#06331a}
+  .opt.wrong{background:var(--bad);border-color:#c22;color:#fff;animation:shake .4s}
+  .opt.dim{opacity:.45}
+  @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-12px)}50%{transform:translateX(10px)}75%{transform:translateX(-6px)}}
+  .qfoot{display:flex;gap:14px;justify-content:space-between;align-items:center;margin-top:26px;flex-wrap:wrap}
+  .verdict{font-size:clamp(26px,2.8vw,48px);font-weight:900}
+  .btn{min-height:76px;padding:0 34px;border-radius:22px;font-size:clamp(20px,2vw,32px);font-weight:900;background:var(--panel2);border:3px solid var(--line);box-shadow:0 6px 0 rgba(0,0,0,.35)}
+  .btn.main{background:var(--yellow);color:#1b1b1b;border-color:#e0a920}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+  .btn[hidden]{display:none}
+  .end{text-align:center}
+  .end .big{font-size:clamp(70px,8vw,130px)}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:20}
+  @media (max-width:900px){ main{grid-template-columns:1fr;overflow:auto} body{overflow:auto} .opts{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="iconbtn" href="index.html" title="Bosh sahifa">🏠</a>
+    <h1>Savollar <span>barabani</span></h1>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="btnSound" title="Ovoz">🔊</button>
+  </header>
+
+  <main>
+    <div class="wheelbox">
+      <svg viewBox="0 0 420 440" aria-label="Baraban">
+        <defs>
+          <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-opacity=".45"/></filter>
+        </defs>
+        <circle cx="210" cy="222" r="206" fill="#0a1124" filter="url(#sh)"/>
+        <g id="wheel"></g>
+        <g class="hub" id="hub">
+          <circle cx="210" cy="222" r="46" fill="#fff" stroke="#e0a920" stroke-width="7"/>
+          <text x="210" y="230" text-anchor="middle" font-size="24" font-weight="900" fill="#14182b">🌍</text>
+        </g>
+        <g id="pointer">
+          <path d="M194 4 L226 4 L210 46 Z" fill="var(--yellow)" stroke="#14182b" stroke-width="4" stroke-linejoin="round"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="side">
+      <button class="spin" id="btnSpin">🎡 Aylantirish</button>
+      <div class="card stats">
+        <div><b id="stLeft">0</b>qoldi</div>
+        <div class="g"><b id="stOk">0</b>to'g'ri</div>
+        <div class="r"><b id="stBad">0</b>xato</div>
+      </div>
+      <div class="card cats" id="cats"></div>
+      <div class="small">
+        <button id="btnReset">🔄 Qaytadan</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="ov">
+  <div class="qcard" id="qcard"></div>
+</div>
+<canvas id="confetti"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+
+// ---------- Savollar bazasi: geografiya ----------
+// Har bir savol: [savol, to'g'ri javob, xato1, xato2, xato3]
+const SUBJECT={ name:"Geografiya", cats:[
+  {name:"Poytaxtlar", short:"Poytaxtlar", icon:"🏛️", color:"#ff6b5e", q:[
+    ["Fransiyaning poytaxti qaysi shahar?","Parij","Lion","Marsel","Nitssa"],
+    ["Yaponiyaning poytaxti qaysi shahar?","Tokio","Osaka","Kioto","Iokogama"],
+    ["Qozog'istonning poytaxti qaysi shahar?","Astana","Olmaota","Shymkent","Qarag'anda"],
+    ["Turkiyaning poytaxti qaysi shahar?","Anqara","Istanbul","Izmir","Antaliya"],
+    ["Misrning poytaxti qaysi shahar?","Qohira","Iskandariya","Luksor","Asvan"],
+    ["Avstraliyaning poytaxti qaysi shahar?","Kanberra","Sidney","Melburn","Pert"],
+  ]},
+  {name:"Daryo va ko'llar", short:"Suvlar", icon:"🌊", color:"#5b8cff", q:[
+    ["Afrikadagi eng uzun daryo qaysi?","Nil","Kongo","Niger","Zambezi"],
+    ["Dunyodagi eng chuqur ko'l qaysi?","Baykal","Kaspiy","Viktoriya","Issiqko'l"],
+    ["Maydoni bo'yicha dunyodagi eng katta ko'l qaysi?","Kaspiy dengizi","Baykal","Viktoriya","Orol dengizi"],
+    ["Amazonka daryosi qaysi materikda oqadi?","Janubiy Amerika","Afrika","Osiyo","Shimoliy Amerika"],
+    ["Volga daryosi qayerga quyiladi?","Kaspiy dengiziga","Qora dengizga","Boltiq dengiziga","Orol dengiziga"],
+  ]},
+  {name:"Tog'lar", short:"Tog'lar", icon:"⛰️", color:"#7ad66b", q:[
+    ["Dunyodagi eng baland cho'qqi qaysi?","Everest (Jomolungma)","K2","Elbrus","Kilimanjaro"],
+    ["Everest cho'qqisi qaysi tog' tizmasida joylashgan?","Himolay","Alp","And","Pomir"],
+    ["Afrikaning eng baland cho'qqisi qaysi?","Kilimanjaro","Kenya tog'i","Elbrus","Monblan"],
+    ["O'zbekistonning eng baland nuqtasi qaysi?","Hazrati Sulton cho'qqisi","Katta Chimyon","Ismoil Somoniy cho'qqisi","Elbrus"],
+    ["Alp tog'lari qaysi materikda joylashgan?","Yevrosiyo (Yevropa qismi)","Afrika","Janubiy Amerika","Avstraliya"],
+  ]},
+  {name:"Materik va okeanlar", short:"Materiklar", icon:"🌎", color:"#2fd3b5", q:[
+    ["Eng katta materik qaysi?","Yevrosiyo","Afrika","Shimoliy Amerika","Antarktida"],
+    ["Eng katta okean qaysi?","Tinch okeani","Atlantika okeani","Hind okeani","Shimoliy Muz okeani"],
+    ["Yer yuzida nechta materik bor?","6 ta","5 ta","7 ta","8 ta"],
+    ["Eng sovuq materik qaysi?","Antarktida","Yevrosiyo","Shimoliy Amerika","Avstraliya"],
+    ["Madagaskar oroli qaysi okeanda joylashgan?","Hind okeanida","Tinch okeanida","Atlantika okeanida","Shimoliy Muz okeanida"],
+  ]},
+  {name:"O'zbekiston", short:"O'zbekiston", icon:"🇺🇿", color:"#ffc53d", q:[
+    ["O'zbekistonda nechta viloyat bor?","12 ta","10 ta","13 ta","14 ta"],
+    ["O'zbekiston nechta davlat bilan chegaradosh?","5 ta","4 ta","6 ta","7 ta"],
+    ["Maydoni bo'yicha O'zbekistonning eng katta hududi qaysi?","Qoraqalpog'iston Respublikasi","Navoiy viloyati","Buxoro viloyati","Qashqadaryo viloyati"],
+    ["Qizilqum cho'li qaysi daryolar oralig'ida joylashgan?","Amudaryo va Sirdaryo","Zarafshon va Chirchiq","Sirdaryo va Chirchiq","Amudaryo va Zarafshon"],
+    ["Samarqand shahri qaysi daryo vodiysida joylashgan?","Zarafshon","Chirchiq","Sirdaryo","Qashqadaryo"],
+  ]},
+  {name:"Yer va xarita", short:"Xarita", icon:"🧭", color:"#a78bfa", q:[
+    ["Yer o'z o'qi atrofida taxminan necha soatda bir marta aylanadi?","24 soatda","12 soatda","48 soatda","365 soatda"],
+    ["Ekvator Yerni qanday qismlarga ajratadi?","Shimoliy va janubiy yarimsharga","G'arbiy va sharqiy yarimsharga","Materik va okeanlarga","Kun va tunga"],
+    ["Bosh (nolinchi) meridian qaysi joydan o'tadi?","Grinvich (London)","Parij","Rim","Toshkent"],
+    ["Kompas strelkasi doim qaysi tomonni ko'rsatadi?","Shimolni","Janubni","Sharqni","G'arbni"],
+    ["Xaritada masofalarning necha marta kichraytirilganini nima ko'rsatadi?","Masshtab","Shartli belgilar","Parallel","Kompas"],
+  ]},
+  {name:"Davlatlar", short:"Davlatlar", icon:"🗺️", color:"#ff9f43", q:[
+    ["Maydoni bo'yicha dunyodagi eng katta davlat qaysi?","Rossiya","Kanada","Xitoy","AQSH"],
+    ["Aholisi eng ko'p davlat qaysi?","Hindiston","Xitoy","AQSH","Indoneziya"],
+    ["Dunyodagi eng kichik davlat qaysi?","Vatikan","Monako","San-Marino","Lixtenshteyn"],
+    ["Qadimiy piramidalari bilan mashhur davlat qaysi?","Misr","Gretsiya","Italiya","Hindiston"],
+    ["Kenguru qaysi davlatning ramzi hisoblanadi?","Avstraliya","Braziliya","Janubiy Afrika","Kanada"],
+  ]},
+  {name:"Tabiat", short:"Tabiat", icon:"🌦️", color:"#f472b6", q:[
+    ["Dunyodagi eng katta issiq cho'l qaysi?","Sahroi Kabir","Gobi","Qizilqum","Atakama"],
+    ["Yerni o'rab turgan havo qobig'i nima deb ataladi?","Atmosfera","Gidrosfera","Litosfera","Biosfera"],
+    ["Yerning suv qobig'i nima deb ataladi?","Gidrosfera","Atmosfera","Litosfera","Biosfera"],
+    ["Vulqondan otilib chiqadigan qaynoq suyuq tog' jinsi nima deyiladi?","Lava","Granit","Qum","Muzlik"],
+    ["Eng ko'p yog'in tushadigan tabiiy zona qaysi?","Nam ekvatorial o'rmonlar","Cho'llar","Tundra","Dashtlar"],
+  ]},
+]};
+const CATS=SUBJECT.cats, N=CATS.length, SEG=360/N;
+
+// ---------- Holat ----------
+let used=CATS.map(()=>new Set()), ok=0, bad=0, rot=0, spinning=false, current=null, sound=true;
+try{ sound=JSON.parse(localStorage.getItem("aqlli-sinf-baraban-ovoz")??"true"); }catch(e){}
+
+function rnd(n){ const max=Math.floor(0x100000000/n)*n, a=new Uint32Array(1); do{crypto.getRandomValues(a);}while(a[0]>=max); return a[0]%n; }
+const shuffle=a=>{ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const left=c=>CATS[c].q.length-used[c].size;
+
+// ---------- Ovoz ----------
+let AC=null;
+function tone(f,d=.08,type="sine",v=.15,w=0){
+  if(!sound) return;
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+  const t=AC.currentTime+w,o=AC.createOscillator(),g=AC.createGain();
+  o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02);
+}
+
+// ---------- Barabanni chizish ----------
+const CX=210, CY=222, R=200;
+const pt=(a,r)=>[CX+r*Math.sin(a*Math.PI/180), CY-r*Math.cos(a*Math.PI/180)];
+function drawWheel(){
+  let s="";
+  CATS.forEach((c,i)=>{
+    const a0=i*SEG, a1=a0+SEG, [x0,y0]=pt(a0,R), [x1,y1]=pt(a1,R), done=left(i)===0;
+    s+=`<path d="M${CX} ${CY} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1} Z" fill="${done?"#3a4466":c.color}" stroke="#0a1124" stroke-width="3"/>`;
+    const mid=a0+SEG/2;
+    s+=`<g transform="rotate(${mid} ${CX} ${CY})" opacity="${done?.45:1}">
+      <text x="${CX}" y="${CY-R*.74}" text-anchor="middle" font-size="34">${done?"✓":c.icon}</text>
+      <text x="${CX}" y="${CY-R*.52}" text-anchor="middle" font-size="15" font-weight="900" fill="${done?"#a9b4d6":"#14182b"}">${c.short}</text>
+    </g>`;
+  });
+  for(let i=0;i<N;i++){ const [x,y]=pt(i*SEG,R-6); s+=`<circle cx="${x}" cy="${y}" r="6" fill="#fff" stroke="#0a1124" stroke-width="2"/>`; }
+  $("wheel").innerHTML=s;
+  $("wheel").style.transform=`rotate(${rot}deg)`;
+}
+function drawSide(){
+  const total=CATS.reduce((n,c,i)=>n+left(i),0);
+  $("stLeft").textContent=total; $("stOk").textContent=ok; $("stBad").textContent=bad;
+  $("cats").innerHTML=CATS.map((c,i)=>`<div class="cat ${left(i)?"":"done"}"><i style="background:${c.color}"></i><span>${c.icon} ${c.name}</span><em>${left(i)}</em></div>`).join("");
+  $("btnSpin").disabled=spinning||total===0;
+}
+
+// ---------- Aylantirish ----------
+function spin(){
+  if(spinning) return;
+  const avail=CATS.map((c,i)=>i).filter(i=>left(i)>0);
+  if(!avail.length){ showEnd(); return; }
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  const target=avail[rnd(avail.length)];
+  const jitter=(rnd(1000)/1000-.5)*SEG*.7;
+  const want=((360-(target*SEG+SEG/2+jitter))%360+360)%360; // ko'rsatkich tepada — shu burchakka to'xtashi kerak
+  let next=rot-(((rot%360)+360)%360)+want+360*5;
+  if(next-rot<360*4) next+=360;
+  const dur=4800+rnd(1200);
+  spinning=true; drawSide();
+  const w=$("wheel");
+  w.style.transition=`transform ${dur}ms cubic-bezier(.12,.62,.08,1)`;
+  w.style.transform=`rotate(${next}deg)`;
+  const start=performance.now(); let lastSeg=Math.floor(norm(rot)/SEG);
+  (function watch(){
+    const ang=currentAngle(w), sg=Math.floor(norm(ang)/SEG);
+    if(sg!==lastSeg){ lastSeg=sg; tone(900,.03,"square",.07); const p=$("pointer"); p.classList.add("tick"); setTimeout(()=>p.classList.remove("tick"),60); }
+    if(performance.now()-start<dur+50) requestAnimationFrame(watch);
+  })();
+  setTimeout(()=>{ rot=next; spinning=false; w.style.transition=""; land(target); },dur+120);
+}
+const norm=a=>((a%360)+360)%360;
+function currentAngle(el){
+  const m=getComputedStyle(el).transform; if(!m||m==="none") return 0;
+  const v=m.match(/matrix\(([^)]+)\)/); if(!v) return 0;
+  const [a,b]=v[1].split(",").map(Number); return Math.atan2(b,a)*180/Math.PI;
+}
+
+// ---------- Savol ----------
+function land(c){
+  const cat=CATS[c];
+  const free=cat.q.map((q,i)=>i).filter(i=>!used[c].has(i));
+  const qi=free[rnd(free.length)]; used[c].add(qi);
+  const [text,right,...wrong]=cat.q[qi];
+  current={c,right,answered:false};
+  [523,784].forEach((f,i)=>tone(f,.18,"triangle",.18,i*.1));
+  const opts=shuffle([right,...wrong]);
+  $("qcard").innerHTML=`
+    <div class="chip" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
+    <div class="qtext">${text}</div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt" data-v="${encodeURIComponent(o)}"><b>${"ABCD"[i]}</b><span>${o}</span></button>`).join("")}</div>
+    <div class="qfoot">
+      <div class="verdict" id="verdict"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn" id="btnShow">👁️ Javobni ko'rsatish</button>
+        <button class="btn" id="btnStar" hidden>⭐ Kim javob berdi?</button>
+        <button class="btn main" id="btnNext" hidden>🎡 Keyingi savol</button>
+      </div>
+    </div>`;
+  $("ov").classList.add("show");
+  $("qcard").querySelectorAll(".opt").forEach(b=>b.onclick=()=>choose(b));
+  $("btnShow").onclick=()=>reveal(null);
+  $("btnNext").onclick=()=>{ $("ov").classList.remove("show"); drawWheel(); drawSide(); if(!CATS.some((x,i)=>left(i))) showEnd(); };
+  drawSide();
+}
+function choose(btn){
+  if(!current||current.answered) return;
+  reveal(decodeURIComponent(btn.dataset.v));
+}
+function reveal(picked){
+  if(current.answered) return; current.answered=true;
+  const isRight=picked===current.right;
+  $("qcard").querySelectorAll(".opt").forEach(b=>{
+    const v=decodeURIComponent(b.dataset.v);
+    if(v===current.right) b.classList.add("right");
+    else if(v===picked) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+  const vd=$("verdict");
+  if(picked===null){ vd.textContent="To'g'ri javob yashil rangda"; vd.style.color="var(--yellow)"; }
+  else if(isRight){ ok++; vd.textContent="🎉 To'g'ri!"; vd.style.color="var(--ok)"; [659,880,1175].forEach((f,i)=>tone(f,.2,"triangle",.18,i*.1)); confetti(); }
+  else { bad++; vd.textContent="❌ Noto'g'ri"; vd.style.color="var(--bad)"; tone(150,.35,"sawtooth",.12); }
+  $("btnShow").hidden=true; $("btnNext").hidden=false;
+  // Sinflar reytingi (F9): to'g'ri javob bergan o'quvchiga 1 ⭐, sinfiga 2 ball
+  if(isRight){ const b=$("btnStar"); b.hidden=false; b.onclick=async()=>{
+    const r=await AqlliUI.pickStudent({title:"Kim to'g'ri javob berdi?"}); if(!r) return;
+    if(await AqlliUI.award({cls:r.cls,student:r.student,stars:1,points:2,source:"wheel",reason:"Savollar barabani"})){ b.disabled=true; b.textContent=`✅ ${r.student.avatar} ${r.student.first_name}`; }
+  }; }
+  drawSide();
+}
+function showEnd(){
+  $("qcard").innerHTML=`<div class="end"><div class="big">🏁</div><div class="qtext">Barcha savollar tugadi!</div>
+    <p style="font-size:clamp(22px,2.2vw,36px);font-weight:800;margin-bottom:24px">To'g'ri: <b style="color:var(--ok)">${ok}</b> · Xato: <b style="color:var(--bad)">${bad}</b></p>
+    <button class="btn main" id="btnAgain">🔄 Qaytadan boshlash</button></div>`;
+  $("ov").classList.add("show"); $("btnAgain").onclick=()=>{ $("ov").classList.remove("show"); reset(); };
+}
+function reset(){ used=CATS.map(()=>new Set()); ok=0; bad=0; drawWheel(); drawSide(); }
+
+// ---------- Konfetti ----------
+function confetti(){
+  const c=$("confetti"),x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols=["#ffc53d","#3ddc84","#5b8cff","#ff6b5e","#fff"];
+  const P=Array.from({length:150},()=>({x:c.width/2+(Math.random()-.5)*c.width*.4,y:c.height*.4,vx:(Math.random()-.5)*20,vy:-Math.random()*20-6,r:Math.random()*8+5,c:cols[Math.random()*5|0],a:Math.random()*6}));
+  const t0=performance.now();
+  (function step(t){ x.clearRect(0,0,c.width,c.height);
+    P.forEach(p=>{p.vy+=.55;p.x+=p.vx;p.y+=p.vy;p.a+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore();});
+    if(t-t0<3000) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height); })(t0);
+}
+
+// ---------- Tugmalar ----------
+$("btnSpin").onclick=spin;
+$("hub").onclick=spin;
+$("btnReset").onclick=()=>{ if(!spinning) reset(); };
+function soundIcon(){ $("btnSound").textContent=sound?"🔊":"🔇"; }
+$("btnSound").onclick=()=>{ sound=!sound; try{localStorage.setItem("aqlli-sinf-baraban-ovoz",JSON.stringify(sound));}catch(e){} soundIcon(); };
+addEventListener("keydown",e=>{ if(e.code==="Space"&&!$("ov").classList.contains("show")){ e.preventDefault(); spin(); } });
+
+drawWheel(); drawSide(); soundIcon();
+</script>
+</body>
+</html>

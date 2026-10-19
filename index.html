@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aqlli sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101a33; --panel:#1a2747; --panel2:#24345c; --line:#33467a;
+    --text:#f4f6ff; --muted:#a9b4d6;
+    --yellow:#ffc53d; --coral:#ff6b5e; --teal:#2fd3b5; --blue:#5b8cff; --violet:#a78bfa; --green:#7ad66b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:Nunito,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding:20px 28px 24px;gap:20px}
+  header{display:flex;align-items:center;gap:20px}
+  .logo{width:72px;height:72px;border-radius:22px;background:var(--yellow);display:grid;place-items:center;font-size:42px;box-shadow:0 6px 0 #c9921a}
+  h1{font-size:clamp(32px,4vw,60px);font-weight:900;line-height:1}
+  h1 span{color:var(--yellow)}
+  .sub{color:var(--muted);font-weight:800;font-size:clamp(14px,1.3vw,20px);margin-top:4px}
+  .spacer{flex:1}
+  .clock{text-align:right}
+  .clock b{display:block;font-size:clamp(36px,4.2vw,64px);font-weight:900;line-height:1}
+  .clock span{color:var(--muted);font-weight:800;font-size:clamp(14px,1.3vw,20px)}
+
+  .grid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:22px;min-height:0}
+  .tile{position:relative;border-radius:30px;padding:clamp(18px,2.4vw,36px);display:flex;flex-direction:column;justify-content:flex-end;gap:8px;text-decoration:none;color:#14182b;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.35);transition:transform .12s}
+  .tile:active{transform:translateY(6px);box-shadow:0 4px 0 rgba(0,0,0,.35)}
+  /* ikon oqim ichida turadi va matnni pastga suradi — uzun nom ustma-ust tushmaydi */
+  .tile .ico{margin-bottom:auto;font-size:clamp(44px,min(7vw,11vh),110px);line-height:1;filter:drop-shadow(0 6px 0 rgba(0,0,0,.15))}
+  .tile h2{font-size:clamp(24px,min(3vw,5vh),48px);font-weight:900;line-height:1.05}
+  .tile p{font-size:clamp(15px,1.4vw,22px);font-weight:800;opacity:.75}
+  .t1{background:var(--yellow)}
+  .t2{background:linear-gradient(90deg,var(--coral) 0 50%,var(--blue) 50% 100%)}
+  .t2 h2,.t2 p{color:#fff}
+  .t3{background:linear-gradient(135deg,#8b6cf6 0%,#c06cf0 55%,#f472b6 100%)}
+  .t3 h2,.t3 p{color:#fff}
+  .t4{background:linear-gradient(135deg,#2fd3b5,#1f9e86)} .t4 h2,.t4 p{color:#06231d}
+  .t5{background:linear-gradient(135deg,#ffcf40,#ff9f43)}
+  .soon{background:var(--panel);color:var(--muted);box-shadow:none;border:3px dashed var(--line);pointer-events:none}
+  .soon .ico{opacity:.45;filter:grayscale(.6)}
+  .badge{position:absolute;top:clamp(16px,2vw,28px);right:clamp(16px,2vw,28px);background:var(--panel2);color:var(--muted);padding:6px 14px;border-radius:999px;font-size:clamp(13px,1.1vw,18px);font-weight:900}
+  .new{background:#fff;color:#c2331f}
+  @media (max-width:800px){ .grid{grid-template-columns:1fr 1fr;grid-template-rows:none;overflow:auto} .tile{min-height:180px} body{overflow:auto} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">🎓</div>
+    <div>
+      <h1>Aqlli <span>sinf</span></h1>
+      <div class="sub">ROBOCENTER · dars yordamchisi</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="clock"><b id="time">--:--</b><span id="date"></span></div>
+  </header>
+
+  <main class="grid">
+    <a class="tile t1" href="kim-chiqadi.html">
+      <div class="ico">🎯</div>
+      <h2>Kim chiqadi?</h2>
+      <p>Kamera tasodifiy o'quvchini tanlaydi</p>
+    </a>
+    <a class="tile t2" href="qiziqarli-matematika.html">
+      <span class="badge new">YANGI</span>
+      <div class="ico">🪢</div>
+      <h2>Qiziqarli matematika</h2>
+      <p>Ikki jamoa matematik bellashuvi</p>
+    </a>
+    <a class="tile t3" href="baraban.html">
+      <span class="badge new">YANGI</span>
+      <div class="ico">🎡</div>
+      <h2>Savollar barabani</h2>
+      <p>Geografiya fanidan savollar</p>
+    </a>
+    <a class="tile t4" href="sinf-daftari.html">
+      <span class="badge new">YANGI</span>
+      <div class="ico">📒</div>
+      <h2>Sinf daftari</h2>
+      <p>O'quvchilarga yulduz berish</p>
+    </a>
+    <a class="tile t5" href="reyting.html">
+      <span class="badge new">YANGI</span>
+      <div class="ico">🏆</div>
+      <h2>Sinflar reytingi</h2>
+      <p>Haftaning eng faol sinfi</p>
+    </a>
+    <div class="tile soon"><span class="badge">Tez kunda</span><div class="ico">⏱️</div><h2>Taymer</h2><p>Katta raqamli taymer</p></div>
+    <div class="tile soon"><span class="badge">Tez kunda</span><div class="ico">🔊</div><h2>Shovqin o'lchagich</h2><p>Sinf qanchalik jim?</p></div>
+    <div class="tile soon"><span class="badge">Tez kunda</span><div class="ico">👥</div><h2>Guruhlarga bo'lish</h2><p>Tasodifiy jamoalar</p></div>
+  </main>
+</div>
+<script>
+  const oy=["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"];
+  const kun=["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"];
+  function tick(){
+    const d=new Date();
+    document.getElementById("time").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+    document.getElementById("date").textContent=`${kun[d.getDay()]}, ${d.getDate()}-${oy[d.getMonth()]}`;
+  }
+  tick(); setInterval(tick,10000);
+</script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aqlli sinf — Kim chiqadi?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101a33; --panel:#1a2747; --panel2:#24345c; --line:#33467a;
+    --text:#f4f6ff; --muted:#a9b4d6;
+    --yellow:#ffc53d; --coral:#ff6b5e; --teal:#2fd3b5; --blue:#5b8cff;
+    --radius:22px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:Nunito,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  button{font:inherit;color:inherit;border:0;cursor:pointer}
+
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  header{display:flex;align-items:center;gap:16px;padding:14px 24px}
+  header h1{font-size:clamp(26px,3.2vw,48px);font-weight:900;letter-spacing:.5px}
+  header h1 span{color:var(--yellow)}
+  .chip{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:8px 18px;font-size:clamp(16px,1.5vw,24px);font-weight:800;color:var(--muted);white-space:nowrap}
+  .chip b{color:var(--text)}
+  .spacer{flex:1}
+  .iconbtn{width:64px;height:64px;border-radius:18px;background:var(--panel);border:2px solid var(--line);font-size:30px;display:grid;place-items:center;text-decoration:none;color:inherit}
+  .iconbtn:active{transform:scale(.95)}
+
+  .stage{position:relative;flex:1;margin:0 24px;border-radius:var(--radius);overflow:hidden;background:#0a1124;border:3px solid var(--line)}
+  .stage video,.stage canvas.photo{position:absolute;inset:0;width:100%;height:100%}
+  .stage video{object-fit:contain;transform:scaleX(-1)}
+  .hint{position:absolute;left:50%;top:22px;transform:translateX(-50%);background:rgba(16,26,51,.82);padding:12px 28px;border-radius:999px;font-size:clamp(20px,2.2vw,36px);font-weight:800;white-space:nowrap;pointer-events:none}
+  .center-msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;font-size:clamp(22px,2.4vw,40px);font-weight:800;color:var(--muted)}
+  .center-msg small{display:block;font-size:.6em;margin-top:10px;font-weight:600}
+
+  .countdown{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+  .countdown span{font-size:min(40vh,30vw);font-weight:900;color:var(--yellow);text-shadow:0 10px 60px rgba(0,0,0,.6);animation:pop .9s ease-out both}
+  @keyframes pop{0%{transform:scale(.3);opacity:0}30%{transform:scale(1.1);opacity:1}100%{transform:scale(.9);opacity:.15}}
+  .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+  .flash.on{animation:flash .5s ease-out}
+  @keyframes flash{0%{opacity:.95}100%{opacity:0}}
+
+  .result{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:2vh;background:rgba(10,17,36,.72)}
+  .result.show{display:flex}
+  .result h2{font-size:clamp(34px,5vw,84px);font-weight:900;color:var(--yellow);text-align:center;animation:pop2 .6s ease-out both}
+  .winners{display:flex;gap:4vw;flex-wrap:wrap;justify-content:center}
+  .winner{position:relative;animation:pop2 .6s ease-out both}
+  .winner canvas{display:block;width:min(46vh,34vw);height:min(46vh,34vw);border-radius:50%;border:10px solid var(--yellow);box-shadow:0 0 0 8px rgba(255,197,61,.25),0 20px 60px rgba(0,0,0,.5);background:#000}
+  .winners.many .winner canvas{width:min(34vh,20vw);height:min(34vh,20vw);border-width:8px}
+  .winner .num{position:absolute;top:-6px;left:-6px;width:64px;height:64px;border-radius:50%;background:var(--coral);display:grid;place-items:center;font-size:34px;font-weight:900;border:5px solid var(--bg)}
+  @keyframes pop2{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+
+  footer{display:flex;gap:16px;justify-content:center;padding:16px 24px 20px;flex-wrap:wrap}
+  .btn{min-height:84px;padding:0 40px;border-radius:24px;font-size:clamp(22px,2.2vw,34px);font-weight:900;display:flex;align-items:center;gap:12px;background:var(--panel2);border:3px solid var(--line);box-shadow:0 6px 0 rgba(0,0,0,.35)}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+  .btn.main{background:var(--yellow);color:#1b1b1b;border-color:#e0a920}
+  .btn.go{background:var(--teal);color:#062a23;border-color:#1fb196}
+  .btn[hidden]{display:none}
+
+  /* settings */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:20}
+  .sheet.show{display:flex}
+  .sheet .box{background:var(--panel);border:3px solid var(--line);border-radius:28px;padding:28px 32px;width:min(760px,94vw);max-height:92vh;overflow:auto}
+  .sheet h3{font-size:34px;font-weight:900;margin-bottom:18px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 0;border-bottom:2px solid var(--line)}
+  .row:last-of-type{border-bottom:0}
+  .row label{font-size:22px;font-weight:800}
+  .row label small{display:block;color:var(--muted);font-weight:600;font-size:16px}
+  .seg{display:flex;gap:6px;background:var(--bg);padding:6px;border-radius:16px}
+  .seg button{min-width:56px;height:52px;border-radius:12px;font-size:22px;font-weight:900;color:var(--muted);background:transparent}
+  .seg button.on{background:var(--yellow);color:#1b1b1b}
+  .toggle{width:84px;height:48px;border-radius:999px;background:var(--bg);position:relative;border:2px solid var(--line)}
+  .toggle::after{content:"";position:absolute;top:5px;left:6px;width:34px;height:34px;border-radius:50%;background:var(--muted);transition:.2s}
+  .toggle.on{background:var(--teal)}
+  .toggle.on::after{left:40px;background:#fff}
+  select,input[type=range]{font:inherit;font-size:18px}
+  select{background:var(--bg);color:var(--text);border:2px solid var(--line);border-radius:12px;padding:10px;max-width:320px}
+  input[type=range]{width:220px;accent-color:var(--yellow)}
+  .sheet .actions{display:flex;gap:12px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+  .sheet .btn{min-height:64px;font-size:22px;padding:0 26px}
+
+  .toast{position:fixed;left:50%;bottom:130px;transform:translateX(-50%) translateY(30px);background:var(--coral);color:#fff;padding:16px 30px;border-radius:18px;font-size:24px;font-weight:800;opacity:0;transition:.3s;pointer-events:none;z-index:30;text-align:center;max-width:90vw}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:15}
+  .privacy{position:absolute;right:16px;bottom:12px;font-size:15px;color:var(--muted);background:rgba(16,26,51,.8);padding:6px 12px;border-radius:10px;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="iconbtn" href="index.html" title="Bosh sahifa">🏠</a>
+    <h1>Kim <span>chiqadi?</span></h1>
+    <div class="spacer"></div>
+    <div class="chip" id="stat" hidden></div>
+    <button class="iconbtn" id="btnUpload" title="Rasm bilan sinash">🖼️</button>
+    <button class="iconbtn" id="btnSettings" title="Sozlamalar">⚙️</button>
+  </header>
+
+  <div class="stage" id="stage">
+    <video id="video" playsinline muted></video>
+    <canvas class="photo" id="photo" hidden></canvas>
+    <div class="center-msg" id="msg">Model yuklanmoqda…<small>Birinchi ochilishda internet kerak</small></div>
+    <div class="hint" id="hint" hidden></div>
+    <div class="countdown" id="countdown"></div>
+    <div class="flash" id="flash"></div>
+    <div class="result" id="result">
+      <h2 id="resultTitle">🎉 Doskaga marhamat!</h2>
+      <div class="winners" id="winners"></div>
+    </div>
+    <div class="privacy" id="privacy" hidden>🔒 Rasm saqlanmaydi va hech qayerga yuborilmaydi</div>
+  </div>
+
+  <footer>
+    <button class="btn main" id="btnStart" hidden>📸 Boshlash</button>
+    <button class="btn go" id="btnRoll" hidden>🎲 Tanlash!</button>
+    <button class="btn" id="btnStar" hidden style="background:var(--teal);color:#062a23;border-color:#1fb196">⭐ To'g'ri javob berdi</button>
+    <button class="btn main" id="btnAgain" hidden>🔁 Boshqasini tanlash</button>
+    <button class="btn" id="btnNew" hidden>📸 Yangi rasm</button>
+    <button class="btn" id="btnClose" hidden>✖ Yopish</button>
+  </footer>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="box">
+    <h3>⚙️ Sozlamalar</h3>
+    <div class="row"><label>Nechta o'quvchi tanlansin</label><div class="seg" id="segCount"></div></div>
+    <div class="row"><label>Takrorlanmasin<small>Bir darsda shu o'rindagi o'quvchi qayta tanlanmaydi</small></label><button class="toggle" id="tgRepeat"></button></div>
+    <div class="row"><label>Avtomatik tanlash<small>Yuzlar topilgach o'zi boshlaydi</small></label><button class="toggle" id="tgAuto"></button></div>
+    <div class="row"><label>Ovoz</label><button class="toggle" id="tgSound"></button></div>
+    <div class="row"><label>Kamera</label><select id="selCam"><option value="">Standart kamera</option></select></div>
+    <div class="row"><label>Sezgirlik<small>Yuqori — orqa partalar yaxshiroq topiladi, lekin sekinroq</small></label><div class="seg" id="segLevel"></div></div>
+    <div class="row"><label>Ishonch chegarasi: <span id="confVal"></span><small>Past — ko'proq yuz, lekin xato ramkalar ko'payadi</small></label><input type="range" id="rngConf" min="0.35" max="0.85" step="0.05"></div>
+    <div class="row"><label>Sinov rejimi<small>Ramkalarda ishonch balini ko'rsatish</small></label><button class="toggle" id="tgDebug"></button></div>
+    <div class="actions">
+      <button class="btn" id="btnClearHist">🧹 Yangi dars (tarixni tozalash)</button>
+      <button class="btn main" id="btnSheetClose">Tayyor</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="file" accept="image/*" hidden>
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script type="module">
+import { FaceDetector, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
+
+const WASM  = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
+const MODEL = "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite";
+const PRIVACY_MS = 120000; // 2 daqiqadan keyin rasm o'chiriladi
+
+const $ = id => document.getElementById(id);
+const video=$("video"), photo=$("photo"), pctx=photo.getContext("2d");
+
+// ---------- Sozlamalar ----------
+const defaults={count:1,repeat:true,auto:true,sound:true,cam:"",level:3,conf:0.55,debug:false};
+let S={...defaults};
+try{ S={...defaults,...JSON.parse(localStorage.getItem("aqlli-sinf-sozlama")||"{}")}; }catch(e){}
+const save=()=>{ try{localStorage.setItem("aqlli-sinf-sozlama",JSON.stringify(S));}catch(e){} };
+
+// ---------- Holat ----------
+let detector=null, delegate="", stream=null, state="loading";
+let img=null;            // olingan kadr (faqat xotirada)
+let faces=[];            // {x,y,w,h,score,removed}
+let history=[];          // avval tanlangan o'rinlar: {cx,cy,w,h} normallashtirilgan
+let highlight=-1, winners=[];
+let autoTimer=null, privacyTimer=null, view={s:1,ox:0,oy:0};
+let sid=0;               // rasm sessiyasi raqami (rasm o'chirilganda oshadi)
+
+// ---------- Tasodif (adolatli) ----------
+function rnd(n){ // [0,n) — crypto, rejection sampling
+  const max=Math.floor(0x100000000/n)*n, a=new Uint32Array(1);
+  do{ crypto.getRandomValues(a); }while(a[0]>=max);
+  return a[0]%n;
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const frame=()=>new Promise(r=>requestAnimationFrame(()=>r()));
+
+// ---------- Ovozlar (WebAudio, fayl kerak emas) ----------
+let AC=null;
+function tone(freq,dur=.08,type="square",vol=.12,when=0){
+  if(!S.sound) return;
+  AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+  const t=AC.currentTime+when, o=AC.createOscillator(), g=AC.createGain();
+  o.type=type; o.frequency.value=freq; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(AC.destination); o.start(t); o.stop(t+dur+.02);
+}
+function shutter(){
+  if(!S.sound) return;
+  AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+  const len=AC.sampleRate*.12, b=AC.createBuffer(1,len,AC.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);
+  const s=AC.createBufferSource(), g=AC.createGain(); g.gain.value=.4; s.buffer=b; s.connect(g).connect(AC.destination); s.start();
+}
+const win=()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,"triangle",.18,i*.11));
+
+// ---------- UI yordamchilar ----------
+function show(ids){ ["btnStart","btnRoll","btnStar","btnAgain","btnNew","btnClose"].forEach(id=>$(id).hidden=!ids.includes(id)); }
+function hint(t){ $("hint").hidden=!t; $("hint").textContent=t||""; }
+function msg(t){ $("msg").hidden=!t; $("msg").innerHTML=t||""; }
+let toastT; function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),3200); }
+function stat(t){ $("stat").hidden=!t; $("stat").innerHTML=t||""; }
+
+// ---------- Model ----------
+async function loadModel(){
+  const vision=await FilesetResolver.forVisionTasks(WASM);
+  const opts=d=>({baseOptions:{modelAssetPath:MODEL,delegate:d},runningMode:"IMAGE",minDetectionConfidence:.3});
+  try{ detector=await FaceDetector.createFromOptions(vision,opts("GPU")); delegate="GPU"; }
+  catch(e){ detector=await FaceDetector.createFromOptions(vision,opts("CPU")); delegate="CPU"; }
+}
+
+// ---------- Kamera ----------
+async function startCamera(){
+  stopCamera();
+  try{
+    const v={width:{ideal:1920},height:{ideal:1080}};
+    if(S.cam) v.deviceId={exact:S.cam};
+    stream=await navigator.mediaDevices.getUserMedia({video:v,audio:false});
+    video.srcObject=stream; await video.play();
+    fillCameras();
+    return true;
+  }catch(e){
+    console.warn(e);
+    return false;
+  }
+}
+function stopCamera(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } }
+async function fillCameras(){
+  try{
+    const list=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput");
+    const sel=$("selCam"); sel.innerHTML='<option value="">Standart kamera</option>';
+    list.forEach((d,i)=>{ const o=document.createElement("option"); o.value=d.deviceId; o.textContent=d.label||`Kamera ${i+1}`; if(d.deviceId===S.cam) o.selected=true; sel.appendChild(o); });
+  }catch(e){}
+}
+
+// ---------- Ekranlar ----------
+async function goLive(){
+  clearPhoto();
+  state="live"; $("result").classList.remove("show"); photo.hidden=true; stat("");
+  const ok=stream?true:await startCamera();
+  if(ok){ video.hidden=false; msg(""); hint("Hamma kameraga qarasin! 👀"); show(["btnStart"]); }
+  else { video.hidden=true; hint(""); msg("📷 Kamera topilmadi yoki ruxsat berilmadi<small>Brauzerda kameraga ruxsat bering yoki 🖼️ tugmasi bilan sinf rasmini yuklab sinang</small>"); show([]); }
+}
+
+async function countdownAndCapture(){
+  if(state!=="live") return;
+  state="countdown"; show([]); hint("");
+  const cd=$("countdown");
+  for(const n of [3,2,1]){ cd.innerHTML=`<span>${n}</span>`; tone(n===1?880:660,.15,"sine",.2); await sleep(900); }
+  cd.innerHTML="";
+  // kadr olish (oyna kabi teskari — oldindan ko'ringan rasm bilan bir xil)
+  const c=document.createElement("canvas"); c.width=video.videoWidth; c.height=video.videoHeight;
+  const x=c.getContext("2d"); x.translate(c.width,0); x.scale(-1,1); x.drawImage(video,0,0);
+  shutter(); $("flash").classList.remove("on"); void $("flash").offsetWidth; $("flash").classList.add("on");
+  await analyze(c);
+}
+
+async function analyze(canvas){
+  img=canvas; faces=[]; winners=[]; highlight=-1;
+  state="detecting"; video.hidden=true; photo.hidden=false; msg(""); show([]);
+  hint("🔍 Yuzlar qidirilmoqda…"); layout(); draw();
+  await frame(); await frame();
+  const t0=performance.now();
+  const r=detectFaces(img);
+  const ms=Math.round(performance.now()-t0);
+  faces=r.faces;
+  armPrivacy();
+  const n=faces.length;
+  stat(`Topildi: <b>${n}</b> · ${ms} ms · ${r.tiles} bo'lak · ${delegate}`);
+  if(n===0){
+    hint(""); draw(); state="review";
+    msg("😕 Hech kim ko'rinmayapti<small>Yorug'likni tekshiring yoki sezgirlikni oshiring (⚙️)</small>");
+    show(["btnNew","btnClose"]); return;
+  }
+  state="review"; draw();
+  hint(n===1?"Faqat 1 kishi ko'rindi":`${n} ta o'quvchi topildi · noto'g'ri ramkani bosib o'chiring`);
+  show(["btnRoll","btnNew","btnClose"]);
+  if(S.auto) autoTimer=setTimeout(roll,1800);
+}
+
+// ---------- Yuzni topish: ko'p o'lchovli bo'laklash ----------
+// Kichik (orqa partadagi) yuzlarni topish uchun rasm turli o'lchamdagi bo'laklarga bo'linadi.
+const tileC=document.createElement("canvas"), tileX=tileC.getContext("2d",{willReadFrequently:false});
+function positions(L,Sz,step){ if(Sz>=L) return [0]; const a=[]; for(let p=0;p+Sz<L;p+=step) a.push(p); a.push(L-Sz); return a; }
+function detectFaces(src){
+  const W=src.width,H=src.height;
+  // g — rasm qisqa tomoni bo'yicha nechta bo'lakka bo'linadi. 1 — butun rasm (yaqindagi yuzlar uchun).
+  const levels={1:[1,2,4],2:[1,2,5],3:[1,2,6],4:[1,2,4,6]}[S.level]||[1,2,6];
+  let all=[], tiles=0;
+  for(const g of levels){
+    if(g===1){
+      tiles++;
+      for(const d of detector.detect(src).detections) push(all,d,0,0,S.conf);
+      continue;
+    }
+    const Sz=Math.round(Math.min(W,H)/g*1.3), step=Math.round(Sz*.7);
+    tileC.width=Sz; tileC.height=Sz;
+    const thr=Math.min(.95,S.conf+(g>=6?.1:.05));
+    for(const y of positions(H,Sz,step)) for(const x of positions(W,Sz,step)){
+      tiles++;
+      tileX.clearRect(0,0,Sz,Sz); tileX.drawImage(src,x,y,Sz,Sz,0,0,Sz,Sz);
+      for(const d of detector.detect(tileC).detections){
+        const b=d.boundingBox, m=3;
+        // bo'lak chetida kesilgan yuzlarni tashlaymiz (qo'shni bo'lak to'liq ko'radi)
+        if((b.originX<m && x>0)||(b.originY<m && y>0)||(b.originX+b.width>Sz-m && x+Sz<W)||(b.originY+b.height>Sz-m && y+Sz<H)) continue;
+        push(all,d,x,y,thr);
+      }
+    }
+  }
+  return {faces:nms(all),tiles};
+}
+function push(arr,d,ox,oy,thr){
+  const s=d.categories?.[0]?.score??0; if(s<thr) return;
+  const b=d.boundingBox; arr.push({x:ox+b.originX,y:oy+b.originY,w:b.width,h:b.height,score:s,removed:false});
+}
+function nms(arr){
+  arr.sort((a,b)=>b.score-a.score); const keep=[];
+  for(const a of arr){
+    let ok=true;
+    for(const k of keep){
+      const ix=Math.max(0,Math.min(a.x+a.w,k.x+k.w)-Math.max(a.x,k.x)), iy=Math.max(0,Math.min(a.y+a.h,k.y+k.h)-Math.max(a.y,k.y));
+      const inter=ix*iy, ua=a.w*a.h+k.w*k.h-inter;
+      if(inter/ua>.3 || inter/Math.min(a.w*a.h,k.w*k.h)>.6){ ok=false; break; }
+    }
+    if(ok) keep.push(a);
+  }
+  return keep.sort((a,b)=>(a.y-b.y)||(a.x-b.x));
+}
+
+// ---------- Takrorlanmaslik (o'rin bo'yicha, tanish emas) ----------
+function wasChosen(f){
+  if(!S.repeat||!img) return false;
+  const cx=(f.x+f.w/2)/img.width, cy=(f.y+f.h/2)/img.height;
+  return history.some(h=>Math.abs(h.cx-cx)<Math.max(h.w,f.w/img.width)*.8 && Math.abs(h.cy-cy)<Math.max(h.h,f.h/img.height)*.8);
+}
+function remember(f){ history.push({cx:(f.x+f.w/2)/img.width,cy:(f.y+f.h/2)/img.height,w:f.w/img.width,h:f.h/img.height}); }
+
+// ---------- Tanlash animatsiyasi ----------
+async function roll(){
+  clearTimeout(autoTimer);
+  if(state!=="review"&&state!=="result") return;
+  $("result").classList.remove("show");
+  let pool=faces.map((f,i)=>i).filter(i=>!faces[i].removed);
+  if(!pool.length){ toast("Tanlash uchun yuz qolmadi"); return; }
+  let elig=pool.filter(i=>!wasChosen(faces[i]));
+  if(!elig.length){ history=[]; elig=pool; toast("🔄 Hamma chiqib bo'ldi — yangi davra!"); }
+  const k=Math.min(S.count,elig.length);
+  state="rolling"; show([]); hint("🥁 Kim ekan…");
+  armPrivacy(); // faollik bo'lsa, 2 daqiqalik hisob qaytadan boshlanadi
+  const my=sid; winners=[];
+  for(let w=0;w<k;w++){
+    const cands=elig.filter(i=>!winners.includes(i));
+    const chosen=cands[rnd(cands.length)];
+    const steps=cands.length===1?6:22+rnd(8);
+    let prev=-1;
+    for(let s=0;s<steps;s++){
+      let idx;
+      if(s===steps-1) idx=chosen;
+      else { do{ idx=cands[rnd(cands.length)]; }while(cands.length>1&&idx===prev); }
+      prev=idx; highlight=idx; draw(); tone(320+rnd(5)*60,.05,"square",.08);
+      const t=s/steps; await sleep(55+420*t*t*t);
+      if(my!==sid) return; // rasm o'chirilgan bo'lsa, to'xtaymiz
+    }
+    winners.push(chosen); remember(faces[chosen]); draw();
+    await sleep(350);
+    if(my!==sid) return;
+  }
+  highlight=-1;
+  showResult();
+}
+
+function showResult(){
+  state="result"; hint(""); win(); confetti();
+  const box=$("winners"); box.innerHTML=""; box.classList.toggle("many",winners.length>1);
+  winners.forEach((i,n)=>{
+    const f=faces[i], pad=.55, cx=f.x+f.w/2, cy=f.y+f.h/2, sz=Math.max(f.w,f.h)*(1+pad*2);
+    const c=document.createElement("canvas"); c.width=c.height=480;
+    c.getContext("2d").drawImage(img,cx-sz/2,cy-sz/2,sz,sz,0,0,480,480);
+    const d=document.createElement("div"); d.className="winner"; d.style.animationDelay=(n*.15)+"s";
+    d.appendChild(c);
+    if(winners.length>1){ const b=document.createElement("div"); b.className="num"; b.textContent=n+1; d.appendChild(b); }
+    box.appendChild(d);
+  });
+  $("result").classList.add("show"); draw();
+  show(["btnStar","btnAgain","btnNew","btnClose"]);
+  const sb=$("btnStar"); sb.disabled=false; sb.textContent="⭐ To'g'ri javob berdi";
+}
+
+// ---------- Chizish ----------
+function layout(){
+  const r=$("stage").getBoundingClientRect(), dpr=Math.min(2,window.devicePixelRatio||1);
+  photo.width=Math.round(r.width*dpr); photo.height=Math.round(r.height*dpr);
+  if(img){ const s=Math.min(photo.width/img.width,photo.height/img.height); view={s,ox:(photo.width-img.width*s)/2,oy:(photo.height-img.height*s)/2}; }
+}
+function rr(x,y,w,h,r){ pctx.beginPath(); pctx.roundRect?pctx.roundRect(x,y,w,h,r):pctx.rect(x,y,w,h); }
+function draw(){
+  pctx.clearRect(0,0,photo.width,photo.height);
+  if(!img) return;
+  const {s,ox,oy}=view, dpr=photo.width/$("stage").clientWidth;
+  pctx.drawImage(img,ox,oy,img.width*s,img.height*s);
+  if(state==="rolling"&&highlight>=0){ pctx.fillStyle="rgba(10,17,36,.45)"; pctx.fillRect(0,0,photo.width,photo.height); }
+  faces.forEach((f,i)=>{
+    if(f.removed) return;
+    const x=ox+f.x*s, y=oy+f.y*s, w=f.w*s, h=f.h*s, pad=Math.max(4,w*.12);
+    const isH=i===highlight, isW=winners.includes(i), old=!isW&&wasChosen(f);
+    if(isH||isW){
+      pctx.save(); pctx.shadowColor="#ffc53d"; pctx.shadowBlur=30*dpr;
+      pctx.lineWidth=Math.max(5,w*.08)*dpr/1.4; pctx.strokeStyle="#ffc53d";
+      rr(x-pad*1.5,y-pad*1.5,w+pad*3,h+pad*3,12*dpr); pctx.stroke(); pctx.restore();
+      if(state==="rolling"){ pctx.save(); rr(x-pad,y-pad,w+pad*2,h+pad*2,10*dpr); pctx.clip(); pctx.drawImage(img,f.x-pad/s,f.y-pad/s,f.w+pad*2/s,f.h+pad*2/s,x-pad,y-pad,w+pad*2,h+pad*2); pctx.restore(); }
+    }else{
+      pctx.lineWidth=3*dpr; pctx.strokeStyle=old?"rgba(169,180,214,.55)":"rgba(255,255,255,.9)";
+      pctx.setLineDash(old?[8*dpr,6*dpr]:[]); rr(x-pad,y-pad,w+pad*2,h+pad*2,10*dpr); pctx.stroke(); pctx.setLineDash([]);
+      if(old){ pctx.font=`900 ${Math.max(14,w*.35)}px Nunito`; pctx.fillStyle="rgba(169,180,214,.9)"; pctx.fillText("✓",x+w-4,y); }
+    }
+    if(S.debug){ pctx.font=`800 ${13*dpr}px Nunito`; pctx.fillStyle="#2fd3b5"; pctx.fillText(f.score.toFixed(2),x-pad,y+h+pad+14*dpr); }
+  });
+}
+
+// ---------- Ramkani bosib o'chirish ----------
+photo.addEventListener("pointerdown",e=>{
+  if(state!=="review"||!img) return;
+  const r=photo.getBoundingClientRect(), dpr=photo.width/r.width;
+  const px=((e.clientX-r.left)*dpr-view.ox)/view.s, py=((e.clientY-r.top)*dpr-view.oy)/view.s;
+  const i=faces.findIndex(f=>!f.removed && px>f.x-f.w*.3 && px<f.x+f.w*1.3 && py>f.y-f.h*.3 && py<f.y+f.h*1.3);
+  if(i<0) return;
+  clearTimeout(autoTimer); faces[i].removed=true; draw();
+  const n=faces.filter(f=>!f.removed).length;
+  hint(`${n} ta o'quvchi · noto'g'ri ramkani bosib o'chiring`);
+  stat(`Topildi: <b>${n}</b>`);
+});
+
+// ---------- Maxfiylik: rasm faqat xotirada, 2 daqiqadan so'ng o'chadi ----------
+function armPrivacy(){ clearTimeout(privacyTimer); $("privacy").hidden=false; privacyTimer=setTimeout(()=>{ toast("🔒 Rasm o'chirildi"); goLive(); },PRIVACY_MS); }
+function clearPhoto(){
+  sid++; clearTimeout(privacyTimer); clearTimeout(autoTimer);
+  if(img){ const c=img.getContext("2d"); c.clearRect(0,0,img.width,img.height); img.width=img.height=0; }
+  img=null; faces=[]; winners=[]; highlight=-1; $("winners").innerHTML=""; $("privacy").hidden=true;
+  pctx.clearRect(0,0,photo.width,photo.height);
+}
+
+// ---------- Konfetti ----------
+function confetti(){
+  const c=$("confetti"), x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols=["#ffc53d","#ff6b5e","#2fd3b5","#5b8cff","#fff"];
+  const P=Array.from({length:180},()=>({x:c.width/2+(Math.random()-.5)*c.width*.3,y:c.height*.45,vx:(Math.random()-.5)*22,vy:-Math.random()*22-6,r:Math.random()*8+5,c:cols[Math.random()*5|0],a:Math.random()*6}));
+  const t0=performance.now();
+  (function step(t){
+    x.clearRect(0,0,c.width,c.height);
+    P.forEach(p=>{ p.vy+=.55; p.x+=p.vx; p.y+=p.vy; p.vx*=.99; p.a+=.2; x.save(); x.translate(p.x,p.y); x.rotate(p.a); x.fillStyle=p.c; x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2); x.restore(); });
+    if(t-t0<3500) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height);
+  })(t0);
+}
+
+// ---------- Sozlamalar oynasi ----------
+function seg(el,vals,key,label=v=>v){
+  el.innerHTML="";
+  vals.forEach(v=>{ const b=document.createElement("button"); b.textContent=label(v); b.classList.toggle("on",S[key]===v); b.onclick=()=>{S[key]=v;save();seg(el,vals,key,label);}; el.appendChild(b); });
+}
+function tg(id,key,after){ const el=$(id); el.classList.toggle("on",!!S[key]); el.onclick=()=>{ S[key]=!S[key]; el.classList.toggle("on",S[key]); save(); after&&after(); }; }
+function renderSettings(){
+  seg($("segCount"),[1,2,3,4],"count");
+  seg($("segLevel"),[1,2,3,4],"level");
+  tg("tgRepeat","repeat",draw); tg("tgAuto","auto"); tg("tgSound","sound"); tg("tgDebug","debug",draw);
+  $("rngConf").value=S.conf; $("confVal").textContent=S.conf.toFixed(2);
+}
+$("rngConf").oninput=e=>{ S.conf=+e.target.value; $("confVal").textContent=S.conf.toFixed(2); save(); };
+$("selCam").onchange=async e=>{ S.cam=e.target.value; save(); stopCamera(); if(state==="live"||state==="loading") goLive(); };
+$("btnSettings").onclick=()=>{ clearTimeout(autoTimer); renderSettings(); $("sheet").classList.add("show"); };
+$("btnSheetClose").onclick=()=>$("sheet").classList.remove("show");
+$("sheet").onclick=e=>{ if(e.target.id==="sheet") $("sheet").classList.remove("show"); };
+$("btnClearHist").onclick=()=>{ history=[]; draw(); toast("🧹 Tarix tozalandi — yangi dars"); };
+
+// ---------- Tugmalar ----------
+$("btnStart").onclick=()=>{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); countdownAndCapture(); };
+$("btnRoll").onclick=roll;
+$("btnAgain").onclick=roll;
+// Sinflar reytingi (F9): kamera bolani tanimaydi — o'qituvchi ismini ro'yxatdan tanlaydi
+$("btnStar").onclick=async()=>{
+  const r=await window.AqlliUI.pickStudent({title:"Doskaga kim chiqdi?"}); if(!r) return;
+  if(await window.AqlliUI.award({cls:r.cls,student:r.student,stars:1,points:1,source:"board",reason:"Doskada to'g'ri javob"})){ $("btnStar").disabled=true; $("btnStar").textContent=`✅ ${r.student.avatar} ${r.student.first_name}`; }
+};
+$("btnNew").onclick=()=>goLive();
+$("btnClose").onclick=()=>goLive();
+addEventListener("pagehide",()=>{ clearPhoto(); stopCamera(); }); // bosh sahifaga qaytganda kamera o'chadi
+$("btnUpload").onclick=()=>{ if(detector) $("file").click(); };
+$("file").onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const im=new Image();
+  im.onload=()=>{
+    const k=Math.min(1,3840/Math.max(im.width,im.height)), c=document.createElement("canvas");
+    c.width=Math.round(im.width*k); c.height=Math.round(im.height*k); c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+    URL.revokeObjectURL(im.src); $("result").classList.remove("show"); analyze(c);
+  };
+  im.src=URL.createObjectURL(f); e.target.value="";
+};
+addEventListener("resize",()=>{ if(img){ layout(); draw(); } });
+addEventListener("keydown",e=>{ if(e.code==="Space"){ e.preventDefault(); if(state==="live") countdownAndCapture(); else if(state==="review"||state==="result") roll(); } });
+
+// ---------- Ishga tushirish ----------
+(async()=>{
+  try{ await loadModel(); }
+  catch(e){ console.error(e); msg("⚠️ Model yuklanmadi<small>Internetni tekshirib, sahifani yangilang</small>"); return; }
+  goLive();
+})();
+</script>
+</body>
+</html>

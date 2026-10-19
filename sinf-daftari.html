@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sinf daftari — Aqlli sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#101a33;--panel:#1a2747;--panel2:#24345c;--line:#33467a;--text:#f4f6ff;--muted:#a9b4d6;--yellow:#ffc53d;--teal:#2fd3b5;--ok:#3ddc84}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:Nunito,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  button,input,select,textarea{font:inherit;color:inherit;border:0}
+  button{cursor:pointer;background:none}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  header{display:flex;align-items:center;gap:12px;padding:10px 18px;flex-wrap:wrap}
+  header h1{font-size:clamp(22px,2.3vw,36px);font-weight:900;white-space:nowrap}
+  header h1 span{color:var(--yellow)}
+  .iconbtn{min-width:56px;height:56px;padding:0 14px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:22px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:inherit;white-space:nowrap}
+  .iconbtn:active{transform:scale(.96)}
+  .iconbtn small{font-size:16px}
+  .spacer{flex:1}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px;scrollbar-width:none}
+  .chip{min-width:72px;height:56px;padding:0 16px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:24px;font-weight:900;color:var(--muted);white-space:nowrap}
+  .chip.on{background:var(--yellow);border-color:#e0a920;color:#1b1b1b}
+  .today{font-weight:900;font-size:clamp(16px,1.4vw,22px);color:var(--muted);white-space:nowrap}
+  .today b{color:var(--yellow)}
+
+  main{flex:1;min-height:0;overflow:auto;padding:6px 18px 18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(140px,11vw,200px),1fr));gap:12px}
+  .kid{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px 12px;border-radius:24px;background:var(--panel);border:3px solid var(--line);box-shadow:0 6px 0 rgba(0,0,0,.3);transition:transform .1s}
+  .kid:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+  .kid .av{font-size:clamp(46px,4.4vw,72px);line-height:1.1}
+  .kid .nm{font-size:clamp(17px,1.4vw,22px);font-weight:900;text-align:center;line-height:1.1}
+  .kid .lv{display:flex;align-items:center;gap:6px;width:100%;padding:0 6px}
+  .kid .lv i{font-style:normal;font-size:22px}
+  .bar{flex:1;height:10px;border-radius:99px;background:var(--bg);overflow:hidden}
+  .bar div{height:100%;background:linear-gradient(90deg,var(--teal),var(--ok));border-radius:99px}
+  .kid .wk{position:absolute;top:8px;right:10px;font-size:15px;font-weight:900;color:var(--yellow)}
+  .kid.pop{animation:kpop .5s}
+  @keyframes kpop{30%{transform:scale(1.08);border-color:var(--yellow)}}
+  .fly{position:fixed;font-size:46px;pointer-events:none;z-index:70;animation:fly .9s ease-out forwards}
+  @keyframes fly{0%{transform:translate(-50%,-50%) scale(.6);opacity:1}100%{transform:translate(-50%,-160%) scale(1.6);opacity:0}}
+  .empty{display:grid;place-items:center;text-align:center;gap:16px;padding:60px 20px;color:var(--muted);font-size:clamp(20px,2vw,30px);font-weight:800}
+
+  /* oynalar */
+  .ov{position:fixed;inset:0;z-index:30;background:rgba(8,13,28,.82);display:none;place-items:center;padding:16px}
+  .ov.show{display:grid}
+  .box{background:var(--panel);border:3px solid var(--line);border-radius:30px;padding:clamp(18px,2.4vw,34px);width:min(980px,96vw);max-height:94vh;overflow:auto;animation:pop .3s ease-out}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+  .bhead{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .bhead h2{flex:1;font-size:clamp(24px,2.6vw,40px);font-weight:900}
+  .x{width:56px;height:56px;border-radius:16px;background:var(--panel2);border:2px solid var(--line);font-size:26px}
+  .who{display:flex;align-items:center;gap:22px;margin-bottom:20px}
+  .who .av{font-size:clamp(80px,9vw,130px);line-height:1}
+  .who .nm{font-size:clamp(30px,3.4vw,56px);font-weight:900;line-height:1.05}
+  .who .lvl{font-size:clamp(18px,1.7vw,26px);font-weight:800;color:var(--muted);margin-top:6px}
+  .who .bar{height:16px;margin-top:10px;max-width:420px}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .badge{padding:6px 14px;border-radius:999px;background:var(--bg);font-weight:800;font-size:clamp(14px,1.2vw,18px)}
+  .reasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .reason{min-height:clamp(84px,11vh,120px);border-radius:22px;background:var(--panel2);border:3px solid var(--line);font-size:clamp(20px,1.9vw,30px);font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 6px 0 rgba(0,0,0,.3)}
+  .reason b{font-size:1.5em}
+  .reason:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+  .hint{color:var(--muted);font-weight:700;margin:14px 0 8px;font-size:17px}
+
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .inp{background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-size:20px;font-weight:800;outline:none;min-width:0}
+  .btn{min-height:56px;padding:0 22px;border-radius:16px;background:var(--panel2);border:2px solid var(--line);font-size:20px;font-weight:900;white-space:nowrap}
+  .btn.main{background:var(--yellow);color:#1b1b1b;border-color:#e0a920}
+  .btn.danger{background:#5a2330;border-color:#ff6b5e}
+  .list{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+  .li{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:16px;background:var(--bg)}
+  .li .av{font-size:34px}
+  .li .nm{flex:1;font-weight:900;font-size:20px}
+  .avs{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;margin:10px 0}
+  .avs button{font-size:34px;height:58px;border-radius:14px;background:var(--bg);border:2px solid transparent}
+  .avs button.on{border-color:var(--yellow);background:var(--panel2)}
+  textarea.inp{width:100%;min-height:120px;resize:vertical}
+  .sec{border-top:2px solid var(--line);padding-top:16px;margin-top:16px}
+  .sec h3{font-size:22px;font-weight:900;margin-bottom:10px}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:80}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="iconbtn" href="index.html" title="Bosh sahifa">🏠</a>
+    <h1>Sinf <span>daftari</span></h1>
+    <div class="chips" id="chips"></div>
+    <div class="spacer"></div>
+    <div class="today" id="today"></div>
+    <button class="iconbtn" id="btnAtt" title="Bugun hamma keldi">📅 <small>Davomat</small></button>
+    <button class="iconbtn" id="btnManage" title="O'quvchilar">👥 <small>O'quvchilar</small></button>
+    <a class="iconbtn" href="reyting.html" title="Reyting">🏆 <small>Reyting</small></a>
+  </header>
+  <main><div class="grid" id="grid"></div><div id="emptyBox"></div></main>
+</div>
+
+<!-- O'quvchiga yulduz berish -->
+<div class="ov" id="ovKid"><div class="box">
+  <div class="bhead"><h2>⭐ Yulduz berish</h2><button class="x" data-close>✕</button></div>
+  <div class="who" id="who"></div>
+  <div class="reasons" id="reasons"></div>
+</div></div>
+
+<!-- O'quvchilar va sinflarni boshqarish -->
+<div class="ov" id="ovManage"><div class="box">
+  <div class="bhead"><h2 id="mTitle">👥 O'quvchilar</h2><button class="x" data-close>✕</button></div>
+  <div class="row" id="editRow">
+    <input class="inp" id="fName" placeholder="Ism" maxlength="40" style="flex:2">
+    <input class="inp" id="fInit" placeholder="Fam. harfi" maxlength="3" style="flex:1;max-width:150px">
+    <button class="btn main" id="fSave">➕ Qo'shish</button>
+    <button class="btn" id="fCancel" hidden>Bekor</button>
+  </div>
+  <div class="avs" id="avs"></div>
+  <div class="list" id="mList"></div>
+  <div class="sec">
+    <h3>📋 Ro'yxatni birdaniga qo'shish</h3>
+    <p class="hint">Har qatorga bitta o'quvchi: "Ism F." (masalan: <b>Ali V.</b>). Avatar avtomatik tanlanadi.</p>
+    <textarea class="inp" id="bulk" placeholder="Ali V.&#10;Laylo K.&#10;Bobur S."></textarea>
+    <div class="row" style="margin-top:10px"><button class="btn main" id="bulkAdd">📥 Ro'yxatni qo'shish</button></div>
+  </div>
+  <div class="sec" id="classSec">
+    <h3>🏫 Yangi sinf</h3>
+    <div class="row">
+      <select class="inp" id="cGrade"></select>
+      <input class="inp" id="cLetter" placeholder="Harf (A, B, V)" maxlength="3" style="max-width:200px">
+      <button class="btn main" id="cAdd">➕ Sinf qo'shish</button>
+    </div>
+  </div>
+  <div class="sec" id="acctSec"></div>
+</div></div>
+
+<canvas id="confetti"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+const $=id=>document.getElementById(id), S=AqlliStore, esc=AqlliUI.esc;
+let classes=[], cur=null, kids=[], totals={}, info=null, editId=null, pickAv=S.AVATARS[0];
+
+async function load(){
+  classes=await S.classes();
+  const last=AqlliUI.lastClass.get();
+  cur=classes.find(c=>c.id===(cur&&cur.id))||classes.find(c=>c.id===last)||classes[0]||null;
+  drawChips();
+  if(!cur){ $("grid").innerHTML=""; $("emptyBox").innerHTML=`<div class="empty">🏫 Hali sinflar yo'q<button class="btn main" onclick="openManage()">➕ Sinf qo'shish</button></div>`; $("today").textContent=""; return; }
+  $("emptyBox").innerHTML="";
+  [kids,totals]=await Promise.all([S.students(cur.id), S.totals(cur.id)]);
+  drawGrid(); drawToday();
+}
+function drawChips(){
+  $("chips").innerHTML=classes.map(c=>`<button class="chip ${cur&&c.id===cur.id?"on":""}" data-id="${c.id}">${c.grade}-${esc(c.letter)}</button>`).join("");
+  $("chips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{ cur=classes.find(c=>c.id===b.dataset.id); AqlliUI.lastClass.set(cur.id); load(); });
+}
+const T=id=>totals[id]||{stars:0,week_stars:0,wheel_stars:0,board_stars:0,help_stars:0,homework_stars:0,streak:0};
+function drawGrid(){
+  if(!kids.length){ $("grid").innerHTML=""; $("emptyBox").innerHTML=`<div class="empty">👥 Bu sinfda hali o'quvchilar yo'q<button class="btn main" onclick="openManage()">➕ O'quvchi qo'shish</button></div>`; return; }
+  // alifbo tartibida — ball bo'yicha tartiblanmaydi (F9.4)
+  $("grid").innerHTML=kids.map(s=>{
+    const t=T(s.id), L=S.level(t.stars);
+    return `<button class="kid" data-id="${s.id}">
+      ${t.week_stars?`<span class="wk">+${t.week_stars}⭐</span>`:""}
+      <span class="av">${s.avatar}</span><span class="nm">${esc(s.first_name)} ${esc(s.last_initial)}</span>
+      <span class="lv"><i>${L.icon}</i><span class="bar"><div style="width:${Math.round(L.progress*100)}%"></div></span></span>
+    </button>`;
+  }).join("");
+  $("grid").querySelectorAll(".kid").forEach(b=>b.onclick=()=>openKid(b.dataset.id));
+}
+function drawToday(){
+  $("today").innerHTML=cur?`${cur.grade}-${esc(cur.letter)} · <b>${kids.length}</b> o'quvchi`:"";
+}
+
+// ---------- Yulduz berish ----------
+let kidOpen=null;
+function openKid(id){
+  const s=kids.find(k=>k.id===id); kidOpen=s; const t=T(id), L=S.level(t.stars), B=S.badges(t);
+  $("who").innerHTML=`<div class="av">${s.avatar}</div><div style="flex:1">
+    <div class="nm">${esc(s.first_name)} ${esc(s.last_initial)}</div>
+    <div class="lvl">${L.icon} ${L.name} · ⭐ ${t.stars}${L.next?` · keyingi: ${L.next.icon} ${L.next.name} (${L.next.at})`:""} · bu hafta: ${t.week_stars}</div>
+    <div class="bar"><div style="width:${Math.round(L.progress*100)}%"></div></div>
+    <div class="badges">${B.map(([i,n])=>`<span class="badge">${i} ${n}</span>`).join("")}</div></div>`;
+  $("reasons").innerHTML=S.REASONS.map(([i,n])=>`<button class="reason" data-r="${n}"><b>${i}</b>${n}</button>`).join("");
+  $("reasons").querySelectorAll(".reason").forEach(b=>b.onclick=()=>give(s,b.dataset.r));
+  $("ovKid").classList.add("show");
+}
+async function give(s,reason){
+  $("ovKid").classList.remove("show");
+  const before=S.level(T(s.id).stars).index;
+  try{
+    const r=await S.give({class_id:cur.id,student_id:s.id,stars:1,points:1,source:"manual",reason});
+    const card=$("grid").querySelector(`[data-id="${s.id}"]`);
+    if(card){ const rc=card.getBoundingClientRect(); const f=document.createElement("div"); f.className="fly"; f.textContent="⭐"; f.style.left=rc.left+rc.width/2+"px"; f.style.top=rc.top+rc.height/2+"px"; document.body.appendChild(f); setTimeout(()=>f.remove(),900); card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop"); }
+    tone([880,1175]);
+    AqlliUI.toast(`⭐ ${s.avatar} ${s.first_name} — ${reason}${r.queued?" (navbatda)":""}`,{undo:async()=>{ try{ await S.revoke(r.client_id); AqlliUI.toast("Bekor qilindi"); load(); }catch(e){ AqlliUI.toast(e.message,{error:true}); } }});
+    await load();
+    const after=S.level(T(s.id).stars);
+    if(after.index>before){ confetti(); tone([523,659,784,1047]); setTimeout(()=>AqlliUI.toast(`🎉 ${s.first_name} yangi darajaga chiqdi: ${after.icon} ${after.name}!`),400); }
+  }catch(e){ AqlliUI.toast(e.message,{error:true}); }
+}
+$("btnAtt").onclick=async()=>{
+  if(!cur) return;
+  try{ const r=await S.give({class_id:cur.id,points:5,source:"attendance",reason:"Davomat"}); tone([660,880]);
+    AqlliUI.toast(`📅 ${cur.grade}-${cur.letter}: bugun hamma keldi, +5 ball`,{undo:async()=>{ await S.revoke(r.client_id); AqlliUI.toast("Bekor qilindi"); }}); }
+  catch(e){ AqlliUI.toast(e.message,{error:true}); }
+};
+
+// ---------- Boshqarish ----------
+function openManage(){
+  $("ovManage").classList.add("show");
+  $("classSec").hidden=!(S.mode==="demo"||(info&&info.role==="school_admin"));
+  $("cGrade").innerHTML=[1,2,3,4,5,6,7,8,9,10,11].map(g=>`<option value="${g}">${g}-sinf</option>`).join("");
+  $("acctSec").innerHTML=S.mode==="cloud"?`<h3>👤 Hisob</h3><div class="row"><span class="hint" style="margin:0">${esc(info&&info.name||"")} · ${esc(info&&info.role||"")}</span><button class="btn" id="logout">🚪 Chiqish</button></div>`
+    :`<h3>🧪 Demo rejim</h3><p class="hint">Ma'lumotlar faqat shu brauzerda saqlanadi. Supabase ulanganda hammasi umumiy serverga yoziladi.</p><button class="btn danger" id="resetDemo">♻️ Demo ma'lumotlarni tiklash</button>`;
+  if($("logout")) $("logout").onclick=async()=>{ await S.logout(); location.reload(); };
+  if($("resetDemo")) $("resetDemo").onclick=()=>{ S.resetDemo(); location.reload(); };
+  resetForm(); drawManage();
+}
+window.openManage=openManage;
+function resetForm(){ editId=null; $("fName").value=""; $("fInit").value=""; pickAv=S.AVATARS[Math.floor(Math.random()*S.AVATARS.length)]; $("fSave").textContent="➕ Qo'shish"; $("fCancel").hidden=true; drawAvs(); }
+function drawAvs(){
+  $("avs").innerHTML=S.AVATARS.map(a=>`<button class="${a===pickAv?"on":""}">${a}</button>`).join("");
+  $("avs").querySelectorAll("button").forEach(b=>b.onclick=()=>{ pickAv=b.textContent; drawAvs(); });
+}
+function drawManage(){
+  $("mTitle").textContent=cur?`👥 ${cur.grade}-${cur.letter} o'quvchilari`:"👥 O'quvchilar";
+  $("editRow").style.display=cur?"":"none"; $("avs").style.display=cur?"":"none";
+  $("mList").innerHTML=kids.map(s=>`<div class="li"><span class="av">${s.avatar}</span><span class="nm">${esc(s.first_name)} ${esc(s.last_initial)}</span>
+    <button class="btn" data-e="${s.id}">✏️</button><button class="btn danger" data-a="${s.id}">🗑️</button></div>`).join("");
+  $("mList").querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>{ const s=kids.find(k=>k.id===b.dataset.e); editId=s.id; $("fName").value=s.first_name; $("fInit").value=s.last_initial; pickAv=s.avatar; drawAvs(); $("fSave").textContent="💾 Saqlash"; $("fCancel").hidden=false; $("fName").focus(); });
+  $("mList").querySelectorAll("[data-a]").forEach(b=>b.onclick=async()=>{
+    if(b.dataset.sure!=="1"){ b.dataset.sure="1"; b.textContent="Ishonchingiz komilmi?"; setTimeout(()=>{ b.dataset.sure=""; b.textContent="🗑️"; },3000); return; }
+    try{ await S.archiveStudent(b.dataset.a); await load(); drawManage(); }catch(e){ AqlliUI.toast(e.message,{error:true}); }
+  });
+}
+$("fCancel").onclick=resetForm;
+$("fSave").onclick=async()=>{
+  const n=$("fName").value.trim(); if(!n||!cur) return;
+  const i=$("fInit").value.trim().replace(/\.$/,"");
+  try{ await S.saveStudent({id:editId||undefined,class_id:cur.id,first_name:n,last_initial:i?i.toUpperCase()+".":"",avatar:pickAv}); await load(); resetForm(); drawManage(); }
+  catch(e){ AqlliUI.toast(e.message,{error:true}); }
+};
+$("bulkAdd").onclick=async()=>{
+  if(!cur) return;
+  const lines=$("bulk").value.split(/\n+/).map(l=>l.trim()).filter(Boolean);
+  let k=0;
+  for(const l of lines){
+    const m=l.match(/^(\S+)(?:\s+(\S)\S*)?/); if(!m) continue;
+    try{ await S.saveStudent({class_id:cur.id,first_name:m[1],last_initial:m[2]?m[2].toUpperCase()+".":"",avatar:S.AVATARS[(kids.length+k)%S.AVATARS.length]}); k++; }catch(e){ AqlliUI.toast(e.message,{error:true}); break; }
+  }
+  $("bulk").value=""; await load(); drawManage(); AqlliUI.toast(`✅ ${k} ta o'quvchi qo'shildi`);
+};
+$("cAdd").onclick=async()=>{
+  const g=+$("cGrade").value, l=$("cLetter").value.trim(); if(!l) return;
+  try{ const c=await S.addClass(g,l); $("cLetter").value=""; cur={id:c.id}; AqlliUI.lastClass.set(c.id); await load(); drawManage(); AqlliUI.toast(`🏫 ${g}-${l.toUpperCase()} qo'shildi`); }
+  catch(e){ AqlliUI.toast(e.message,{error:true}); }
+};
+$("btnManage").onclick=openManage;
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest(".ov").classList.remove("show"));
+document.querySelectorAll(".ov").forEach(o=>o.addEventListener("click",e=>{ if(e.target===o) o.classList.remove("show"); }));
+
+// ---------- Ovoz va konfetti ----------
+let AC=null;
+function tone(fs){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); fs.forEach((f,i)=>{ const t=AC.currentTime+i*.09,o=AC.createOscillator(),g=AC.createGain(); o.type="triangle"; o.frequency.value=f; g.gain.setValueAtTime(.16,t); g.gain.exponentialRampToValueAtTime(.0001,t+.22); o.connect(g).connect(AC.destination); o.start(t); o.stop(t+.25); }); }catch(e){} }
+function confetti(){
+  const c=$("confetti"),x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols=["#ffc53d","#3ddc84","#5b8cff","#ff6b5e","#fff"];
+  const P=Array.from({length:160},()=>({x:c.width/2+(Math.random()-.5)*c.width*.4,y:c.height*.4,vx:(Math.random()-.5)*20,vy:-Math.random()*20-6,r:Math.random()*8+5,c:cols[Math.random()*5|0],a:Math.random()*6}));
+  const t0=performance.now();
+  (function step(t){ x.clearRect(0,0,c.width,c.height); P.forEach(p=>{p.vy+=.55;p.x+=p.vx;p.y+=p.vy;p.a+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore();}); if(t-t0<3000) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height); })(t0);
+}
+
+(async()=>{
+  info=await AqlliUI.ensureReady();
+  if(info.role==="screen"){ location.href="reyting.html"; return; }
+  await load();
+  let tm; S.onChange(()=>{ clearTimeout(tm); tm=setTimeout(load,400); });
+})();
+</script>
+</body>
+</html>

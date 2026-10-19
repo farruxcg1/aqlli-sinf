@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arqon rasmi — variantlar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#101a33;--panel:#1a2747;--line:#33467a;--text:#f4f6ff;--muted:#a9b4d6;--yellow:#ffc53d}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:Nunito,system-ui,sans-serif;padding:24px 16px 40px}
+  h1{font-size:clamp(26px,3vw,44px);font-weight:900;text-align:center}
+  .lead{color:var(--muted);font-weight:700;text-align:center;margin:6px 0 24px;font-size:clamp(15px,1.4vw,20px)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(520px,100%),1fr));gap:22px;max-width:1700px;margin:0 auto}
+  .card{background:var(--panel);border:3px solid var(--line);border-radius:26px;padding:16px}
+  .card h2{font-size:clamp(22px,2vw,30px);font-weight:900;margin:4px 6px 12px}
+  .card h2 b{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--yellow);color:#1b1b1b;margin-right:10px}
+  .card p{color:var(--muted);font-weight:700;margin:12px 6px 4px;font-size:17px}
+  svg{width:100%;height:auto;display:block;border-radius:18px}
+  .rope{transition:transform .55s cubic-bezier(.3,1.6,.5,1)}
+  .lean{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s}
+</style>
+</head>
+<body>
+  <h1>🪢 Arqon tortish rasmi — variantlar</h1>
+  <p class="lead">Rasmlar jonli: arqon har soniyada u yoqqa-bu yoqqa tortilmoqda. Qaysi biri yoqsa, raqamini ayting.</p>
+  <div class="grid">
+    <div class="card"><h2><b>1</b>Bog'da (kunduzi)</h2><div id="v1"></div><p>Quyoshli kun, maysa, o'rtada loy ko'lmak. Eng yorqin va bolalarga yaqin variant.</p></div>
+    <div class="card"><h2><b>2</b>Stadion (kechqurun)</h2><div id="v2"></div><p>Projektor chiroqlari, tribunada jamoalarni qo'llab-quvvatlayotgan muxlislar. Bellashuv ruhi kuchli.</p></div>
+    <div class="card"><h2><b>3</b>Quyosh botishi (siluet)</h2><div id="v3"></div><p>To'q siluetlar, rangli peshonabog'lar. Eng "kinodagidek" va zamonaviy ko'rinish.</p></div>
+  </div>
+
+<script>
+// ===================== BOLA (yon tomondan, o'ngga qarab tortadi) =====================
+// Mahalliy koordinata: oyoqlar markazi (0,0), yuqoriga — manfiy y. Qo'llar arqonni y=-61 da ushlaydi.
+function kid(o){
+  const sil=o.sil, skin=sil?o.silColor:o.skin, skinD=sil?o.silColor:shade(o.skin,-.12);
+  const pants=sil?o.silColor:o.pants, shirt=sil?o.silColor:o.shirt, shirtD=sil?o.silColor:shade(o.shirt,-.18);
+  const hair=sil?o.silColor:o.hair, shoe=sil?o.silColor:"#fff";
+  let hairSvg="";
+  if(o.hairStyle==="pony") hairSvg=`<path d="M-41,-99 A14 14 0 0 1 -13,-105 L-18,-104 C-24,-109 -33,-106 -37,-95 Z" fill="${hair}"/><ellipse cx="-44" cy="-96" rx="6" ry="9" fill="${hair}" transform="rotate(-20 -44 -96)"/>`;
+  else if(o.hairStyle==="curly") hairSvg=[[-36,-104,7],[-28,-110,7],[-19,-109,6],[-39,-96,6],[-14,-105,4]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${hair}"/>`).join("");
+  else hairSvg=`<path d="M-41,-97 A14 14 0 0 1 -13,-104 L-17,-103 C-24,-109 -33,-105 -37,-94 Z" fill="${hair}"/>`;
+  const band=o.band?`<path d="M-40,-103 L-14,-107" stroke="${o.band}" stroke-width="4.5" stroke-linecap="round"/><path d="M-40,-103 L-50,-98 M-40,-103 L-49,-106" stroke="${o.band}" stroke-width="3" stroke-linecap="round"/>`:"";
+  const face=sil?"":`
+      <ellipse cx="-31" cy="-98" rx="3" ry="4" fill="${skinD}"/>
+      <path d="M-21,-106 L-16,-105" stroke="#3a2a20" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="-18" cy="-101" r="1.9" fill="#222"/>
+      <circle cx="-20" cy="-95" r="3" fill="#ff8a80" opacity=".45"/>
+      <path d="M-15,-93 L-21,-92" stroke="#7a3b2e" stroke-width="2" stroke-linecap="round"/>`;
+  const stripe=sil&&o.shirtAccent?`<path d="M-8,-46 L-20,-76" stroke="${o.shirtAccent}" stroke-width="5" stroke-linecap="round" opacity=".9"/>`:"";
+  return `
+  <g transform="translate(${o.x} ${o.y}) ${o.flip?"scale(-1 1)":""} scale(${o.s})">
+    ${o.shadow?`<ellipse cx="2" cy="1" rx="30" ry="5" fill="rgba(0,0,0,.25)"/>`:""}
+    <g class="lean">
+      <path d="M-19,-77 Q-2,-69 14,-63" stroke="${skinD}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M-7,-42 L-17,-21 L-19,-6" stroke="${shade(pants,-.15)}" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="-28" y="-9" width="21" height="9" rx="4" fill="${shoe}" stroke="${sil?shoe:"#2b2f45"}" stroke-width="1.5"/>
+      <path d="M-4,-42 L10,-24 L20,-6" stroke="${pants}" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="13" y="-9" width="22" height="9" rx="4" fill="${shoe}" stroke="${sil?shoe:"#2b2f45"}" stroke-width="1.5"/>
+      ${sil?"":`<path d="M13,-1 L35,-1" stroke="${o.shirt}" stroke-width="2.5"/><path d="M-28,-1 L-7,-1" stroke="${o.shirt}" stroke-width="2.5"/>`}
+      <path d="M-6,-40 L-21,-80" stroke="${shirt}" stroke-width="25" fill="none" stroke-linecap="round"/>
+      ${sil?"":`<path d="M-1,-44 L-14,-78" stroke="${shade(o.shirt,.18)}" stroke-width="6" fill="none" stroke-linecap="round" opacity=".7"/>
+      <path d="M-14,-38 L2,-44" stroke="${shade(o.pants,-.3)}" stroke-width="5" stroke-linecap="round"/>`}
+      ${stripe}
+      <path d="M-22,-83 L-25,-89" stroke="${skin}" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="-27" cy="-99" r="14" fill="${skin}"/>
+      ${hairSvg}${band}${face}
+      <path d="M-21,-79 L-11,-74" stroke="${shirtD}" stroke-width="12" stroke-linecap="round"/>
+      <path d="M-13,-74 Q2,-68 17,-62" stroke="${skin}" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <circle cx="18" cy="-61" r="5.5" fill="${skin}"/>
+    </g>
+  </g>`;
+}
+function shade(hex,amt){
+  if(!hex||hex[0]!=="#") return hex;
+  let n=parseInt(hex.slice(1),16), r=n>>16, g=n>>8&255, b=n&255;
+  const f=v=>Math.max(0,Math.min(255,Math.round(amt<0?v*(1+amt):v+(255-v)*amt)));
+  return "#"+((1<<24)+(f(r)<<16)+(f(g)<<8)+f(b)).toString(16).slice(1);
+}
+
+// ===================== ARQON =====================
+function rope(o){
+  return `
+    <path d="M-10 169 Q210 178 430 169" fill="none" stroke="${o.c1}" stroke-width="8" stroke-linecap="round"/>
+    <path d="M-10 169 Q210 178 430 169" fill="none" stroke="${o.c2}" stroke-width="3.5" stroke-dasharray="5 6" stroke-linecap="round"/>
+    <path d="M-10 169 Q210 178 430 169" fill="none" stroke="${o.c3}" stroke-width="2" stroke-dasharray="5 6" stroke-dashoffset="5.5" stroke-linecap="round" opacity=".6"/>
+    <g transform="translate(210 174)">
+      <circle r="6" fill="${o.knot}"/>
+      <path d="M-2 4 L-9 26 L0 20 L9 26 L2 4 Z" fill="${o.ribbon}" stroke="${shade(o.ribbon,-.3)}" stroke-width="1.2"/>
+    </g>`;
+}
+
+const TEAM_L=[{skin:"#f2c39b",hair:"#3a2a20",hairStyle:"short"},{skin:"#e0a77a",hair:"#1f1a17",hairStyle:"pony"},{skin:"#c98e62",hair:"#2b1d14",hairStyle:"curly"}];
+const TEAM_R=[{skin:"#e8b48a",hair:"#1f1a17",hairStyle:"short"},{skin:"#f2c39b",hair:"#6b4423",hairStyle:"pony"},{skin:"#d39a6c",hair:"#3a2a20",hairStyle:"short"}];
+function teams(base){
+  // chap jamoa: 40, 86, 132 ; o'ng jamoa (ko'zgu): 380, 334, 288
+  const xsL=[42,88,134], xsR=[378,332,286];
+  return TEAM_L.map((k,i)=>kid({...base,...k,x:xsL[i],flip:false,shirt:base.L,shirtAccent:base.L,band:base.sil?base.L:null,pants:base.pantsL})).join("")+
+         TEAM_R.map((k,i)=>kid({...base,...k,x:xsR[i],flip:true,shirt:base.R,shirtAccent:base.R,band:base.sil?base.R:null,pants:base.pantsR})).join("");
+}
+
+function flagPole(x,col,poleCol,y0=232){
+  return `<line x1="${x}" y1="${y0}" x2="${x}" y2="${y0-62}" stroke="${poleCol}" stroke-width="3"/>
+          <path d="M${x} ${y0-62} L${x+(x<210?-22:22)} ${y0-55} L${x} ${y0-48} Z" fill="${col}"/>`;
+}
+
+// ===================== 1-VARIANT: BOG'DA =====================
+function v1(){
+  let tufts="";
+  for(let i=0;i<34;i++){ const x=-95+i*18+(i*7%11), y=246+(i*13%26); tufts+=`<path d="M${x} ${y} l3 -7 l2 7 l3 -6 l1 6" stroke="#2f7d2b" stroke-width="1.6" fill="none"/>`; }
+  let trees=""; [[-60,196],[10,190],[440,192],[495,198]].forEach(([x,y])=>{ trees+=`<rect x="${x-3}" y="${y}" width="6" height="16" fill="#6b4a2b"/><circle cx="${x}" cy="${y-8}" r="16" fill="#4fa14a"/><circle cx="${x-8}" cy="${y-2}" r="11" fill="#5cb456"/>`; });
+  return `
+  <svg viewBox="-100 40 620 240">
+    <defs>
+      <linearGradient id="s1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6cc3ff"/><stop offset="1" stop-color="#d9f2ff"/></linearGradient>
+      <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#63c25a"/><stop offset="1" stop-color="#3d9437"/></linearGradient>
+      <radialGradient id="sun1"><stop offset="0" stop-color="#fff6b0"/><stop offset=".55" stop-color="#ffe066"/><stop offset="1" stop-color="#ffe066" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect x="-100" y="40" width="620" height="200" fill="url(#s1)"/>
+    <circle cx="455" cy="78" r="44" fill="url(#sun1)"/><circle cx="455" cy="78" r="20" fill="#ffe066"/>
+    <g fill="#fff" opacity=".95"><ellipse cx="0" cy="78" rx="30" ry="11"/><ellipse cx="18" cy="70" rx="20" ry="12"/><ellipse cx="250" cy="66" rx="34" ry="10"/><ellipse cx="270" cy="58" rx="20" ry="11"/></g>
+    <path d="M-100 205 Q-20 168 80 196 T300 190 T520 186 L520 232 L-100 232 Z" fill="#9fd47e"/>
+    ${trees}
+    <rect x="-100" y="226" width="620" height="60" fill="url(#g1)"/>
+    ${tufts}
+    <ellipse cx="210" cy="238" rx="64" ry="9" fill="#7a5230"/><ellipse cx="206" cy="236" rx="44" ry="5" fill="#94683f"/>
+    <line x1="210" y1="226" x2="210" y2="250" stroke="#fff" stroke-width="3" opacity=".8"/>
+    ${flagPole(120,"#ff6b5e","#6b6b6b")}${flagPole(300,"#5b8cff","#6b6b6b")}
+    <g class="rope">
+      ${rope({c1:"#b8864b",c2:"#e3c28f",c3:"#7d5528",knot:"#7d5528",ribbon:"#ff3b3b"})}
+      ${teams({y:232,s:.95,sil:false,shadow:true,L:"#ff5a4a",R:"#4a7dff",pantsL:"#2b3a67",pantsR:"#2b3a67"})}
+    </g>
+  </svg>`;
+}
+
+// ===================== 2-VARIANT: STADION =====================
+function v2(){
+  let crowd="", seed=7; const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
+  for(let row=0;row<5;row++) for(let i=0;i<46;i++){
+    const x=-96+i*13.6+(row%2)*6, y=128+row*15, left=x<210;
+    const c=rnd()<.6?(left?"#ff6b5e":"#5b8cff"):(rnd()<.5?"#ffffff":"#ffc53d");
+    crowd+=`<circle cx="${x}" cy="${y}" r="4.2" fill="${c}" opacity="${.55+rnd()*.4}"/><rect x="${x-4}" y="${y+3}" width="8" height="7" rx="3" fill="${c}" opacity=".35"/>`;
+  }
+  let stripes=""; for(let i=0;i<8;i++) stripes+=`<rect x="${-100+i*80}" y="212" width="40" height="70" fill="#2f9a4c"/>`;
+  const light=(x)=>`<line x1="${x}" y1="130" x2="${x}" y2="62" stroke="#59627a" stroke-width="4"/><rect x="${x-16}" y="52" width="32" height="12" rx="3" fill="#cfd8ea"/>
+     <g fill="#fffbe0">${[-11,-4,3,10].map(d=>`<circle cx="${x+d}" cy="58" r="2.6"/>`).join("")}</g>
+     <path d="M${x-16} 64 L${x-120} 240 L${x+120} 240 L${x+16} 64 Z" fill="url(#beam)"/>`;
+  return `
+  <svg viewBox="-100 40 620 240">
+    <defs>
+      <linearGradient id="s2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#081329"/><stop offset="1" stop-color="#1d3566"/></linearGradient>
+      <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe0" stop-opacity=".28"/><stop offset="1" stop-color="#fffbe0" stop-opacity="0"/></linearGradient>
+      <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a8a44"/><stop offset="1" stop-color="#1f6b35"/></linearGradient>
+    </defs>
+    <rect x="-100" y="40" width="620" height="240" fill="url(#s2)"/>
+    <g fill="#fff">${[[-70,60],[40,52],[150,70],[330,58],[470,66],[260,48]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.3"/>`).join("")}</g>
+    <path d="M-100 120 L520 120 L520 212 L-100 212 Z" fill="#26304a"/>
+    ${[0,1,2,3,4].map(r=>`<rect x="-100" y="${136+r*15}" width="620" height="2" fill="#384463"/>`).join("")}
+    ${crowd}
+    <rect x="-100" y="200" width="620" height="12" fill="#3a465f"/><rect x="-100" y="200" width="620" height="3" fill="#ffc53d"/>
+    ${light(-40)}${light(460)}
+    <rect x="-100" y="212" width="620" height="70" fill="url(#g2)"/>${stripes}
+    <line x1="210" y1="212" x2="210" y2="280" stroke="#fff" stroke-width="3" opacity=".85"/>
+    <line x1="120" y1="212" x2="120" y2="280" stroke="#ff6b5e" stroke-width="3" opacity=".9"/>
+    <line x1="300" y1="212" x2="300" y2="280" stroke="#5b8cff" stroke-width="3" opacity=".9"/>
+    <g class="rope">
+      ${rope({c1:"#c49155",c2:"#efd3a2",c3:"#80592c",knot:"#80592c",ribbon:"#ffc53d"})}
+      ${teams({y:238,s:.95,sil:false,shadow:true,L:"#ff5a4a",R:"#4a7dff",pantsL:"#1c2440",pantsR:"#1c2440"})}
+    </g>
+  </svg>`;
+}
+
+// ===================== 3-VARIANT: SILUET =====================
+function v3(){
+  const S="#1d1030";
+  return `
+  <svg viewBox="-100 40 620 240">
+    <defs>
+      <linearGradient id="s3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b1055"/><stop offset=".55" stop-color="#d6457a"/><stop offset="1" stop-color="#ffb347"/></linearGradient>
+      <radialGradient id="sun3"><stop offset="0" stop-color="#fff1b8"/><stop offset=".6" stop-color="#ffd56b"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect x="-100" y="40" width="620" height="240" fill="url(#s3)"/>
+    <circle cx="210" cy="222" r="110" fill="url(#sun3)" opacity=".9"/><circle cx="210" cy="222" r="58" fill="#ffd56b"/>
+    ${[0,1,2,3].map(i=>`<rect x="140" y="${206+i*6}" width="140" height="2" fill="#ffb347" opacity=".55"/>`).join("")}
+    <g fill="${S}" opacity=".55"><path d="M-100 214 Q-40 190 20 210 T140 206 L140 232 L-100 232 Z"/><path d="M280 208 Q360 186 430 206 T520 200 L520 232 L280 232 Z"/></g>
+    <g fill="#2b1055" opacity=".6"><path d="M60 92 q6 -5 12 0 q6 -5 12 0" stroke="#2b1055" stroke-width="2" fill="none"/><path d="M340 78 q5 -4 10 0 q5 -4 10 0" stroke="#2b1055" stroke-width="2" fill="none"/></g>
+    <rect x="-100" y="230" width="620" height="50" fill="${S}"/>
+    ${flagPole(120,"#ff6b5e",S,232)}${flagPole(300,"#5b8cff",S,232)}
+    <g class="rope">
+      ${rope({c1:S,c2:S,c3:S,knot:S,ribbon:"#ffc53d"})}
+      ${teams({y:232,s:.95,sil:true,silColor:S,shadow:false,L:"#ff6b5e",R:"#5b8cff"})}
+    </g>
+  </svg>`;
+}
+
+// ===================== Jonli namoyish =====================
+document.getElementById("v1").innerHTML=v1();
+document.getElementById("v2").innerHTML=v2();
+document.getElementById("v3").innerHTML=v3();
+let pos=0;
+setInterval(()=>{
+  const t=Math.random()<.5?0:1;
+  pos+=t===0?-1:1; if(Math.abs(pos)>5) pos=Math.sign(pos)*4;
+  document.querySelectorAll(".rope").forEach(g=>g.style.transform=`translateX(${pos*90/8}px)`);
+  document.querySelectorAll("svg").forEach(svg=>{
+    const kids=svg.querySelectorAll(".lean");
+    kids.forEach((k,i)=>{ const team=i<3?0:1; k.style.transform=team===t?"rotate(-9deg)":"rotate(3deg)"; });
+    setTimeout(()=>kids.forEach(k=>k.style.transform=""),300);
+  });
+},1100);
+</script>
+</body>
+</html>
