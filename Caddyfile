@@ -25,6 +25,10 @@
 		-Server
 	}
 
+	# "Tez kunda" bo'limlari: hozircha bosh sahifaga qaytaradi
+	redir /sinf-daftari* / 302
+	redir /reyting* / 302
+
 	root * .
 	encode gzip zstd
 
