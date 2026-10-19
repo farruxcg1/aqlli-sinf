@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tabiat sirlari — Aqlli sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101a33; --panel:#1a2747; --panel2:#24345c; --line:#33467a;
+    --text:#f4f6ff; --muted:#a9b4d6;
+    --yellow:#ffc53d; --teal:#2fd3b5;
+    --L:#ff6b5e; --R:#5b8cff;
+    --ok:#3ddc84; --bad:#ff4d4d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:Nunito,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+  button,input{font:inherit;color:inherit;border:0}
+  button{cursor:pointer;background:none}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  header{display:flex;align-items:center;gap:14px;padding:10px 20px}
+  header h1{font-size:clamp(22px,2.4vw,38px);font-weight:900}
+  header h1 span{color:var(--teal)}
+  .spacer{flex:1}
+  .iconbtn{width:58px;height:58px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:26px;display:grid;place-items:center;text-decoration:none;color:inherit}
+  .iconbtn:active{transform:scale(.95)}
+  section{flex:1;min-height:0}
+  section[hidden]{display:none!important}
+
+  /* ---------- Sozlash ---------- */
+  #setup{display:flex;padding:6px 20px 20px;overflow:auto;touch-action:auto}
+  .card{margin:auto;background:var(--panel);border:3px solid var(--line);border-radius:30px;padding:clamp(18px,2.2vw,34px);width:min(1020px,100%)}
+  .card h2{font-size:clamp(26px,2.6vw,40px);font-weight:900;margin-bottom:6px}
+  .card .lead{color:var(--muted);font-weight:700;font-size:clamp(15px,1.3vw,20px);margin-bottom:18px}
+  .teams{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:10px}
+  .teams[hidden]{display:none}
+  .tname{min-width:0;display:flex;align-items:center;gap:10px;border-radius:18px;padding:10px 16px;font-size:24px;font-weight:900}
+  .tname.l{background:var(--L)} .tname.r{background:var(--R)}
+  .tname input{flex:1;min-width:0;background:rgba(255,255,255,.18);border-radius:12px;padding:10px 14px;font-size:24px;font-weight:900;color:#fff;outline:none}
+  .opt{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:clamp(8px,1.4vh,14px) 0;border-top:2px solid var(--line);flex-wrap:wrap}
+  .opt label{font-size:clamp(18px,1.6vw,24px);font-weight:900}
+  .opt label small{display:block;color:var(--muted);font-weight:700;font-size:15px}
+  .seg{display:flex;gap:6px;background:var(--bg);padding:6px;border-radius:16px;flex-wrap:wrap}
+  .seg button{min-width:64px;height:clamp(46px,6.5vh,56px);padding:0 16px;border-radius:12px;font-size:21px;font-weight:900;color:var(--muted)}
+  .seg button.on{background:var(--teal);color:#06231d}
+  .go{display:flex;justify-content:center;margin-top:18px}
+  .btn{min-height:80px;padding:0 44px;border-radius:24px;font-size:clamp(22px,2.2vw,34px);font-weight:900;display:inline-flex;align-items:center;gap:12px;background:var(--panel2);border:3px solid var(--line);box-shadow:0 6px 0 rgba(0,0,0,.35);text-decoration:none;color:inherit}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+  .btn.main{background:var(--teal);color:#06231d;border-color:#1f9e86}
+
+  /* ---------- O'yin ---------- */
+  #game{position:relative;display:flex;flex-direction:column;gap:12px;padding:0 14px 14px}
+  .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .sc{display:flex;align-items:center;gap:10px;padding:8px 18px;border-radius:999px;font-size:clamp(20px,1.9vw,30px);font-weight:900;color:#fff;border:4px solid transparent;transition:.25s;opacity:.55}
+  .sc b{font-size:1.2em}
+  .sc.l{background:var(--L)} .sc.r{background:var(--R)}
+  .sc.turn{opacity:1;border-color:#fff;transform:scale(1.06);box-shadow:0 0 0 6px rgba(255,255,255,.15)}
+  .sc.solo{background:var(--teal);color:#06231d;opacity:1}
+  .prog{margin-left:auto;font-size:clamp(20px,1.9vw,30px);font-weight:900;color:var(--muted)}
+  .question{text-align:center;font-size:clamp(22px,2.2vw,38px);font-weight:900}
+  .question span{color:var(--yellow)}
+
+  .stage{position:relative;flex:1;min-height:0;display:grid;place-items:center}
+  .item{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:6px;padding:clamp(12px,1.6vw,24px) clamp(22px,2.6vw,40px);border-radius:32px;background:#fff;color:#14182b;box-shadow:0 12px 0 rgba(0,0,0,.35);cursor:grab;touch-action:none;transition:transform .35s cubic-bezier(.3,1.5,.5,1),opacity .3s}
+  .item .emo{font-size:clamp(70px,min(9vw,16vh),170px);line-height:1}
+  .item .nm{font-size:clamp(20px,2vw,34px);font-weight:900}
+  .item.drag{transition:none;cursor:grabbing;box-shadow:0 22px 30px rgba(0,0,0,.45)}
+  .item.gone{opacity:0;transform:scale(.3)!important}
+  .item.enter{animation:enter .45s cubic-bezier(.3,1.5,.5,1)}
+  @keyframes enter{0%{transform:scale(.2) rotate(-20deg);opacity:0}100%{transform:none;opacity:1}}
+  .hand{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);color:var(--muted);font-weight:800;font-size:clamp(15px,1.3vw,20px)}
+
+  .zones{display:grid;gap:12px;height:clamp(170px,34vh,340px)}
+  .zone{position:relative;border-radius:26px;border:4px dashed rgba(255,255,255,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px;overflow:hidden;transition:transform .15s,border-color .15s}
+  .zone .zi{font-size:clamp(46px,min(5vw,9vh),96px);line-height:1}
+  .zone .zn{font-size:clamp(20px,2vw,34px);font-weight:900;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.3);text-align:center}
+  .zone .got{position:absolute;left:8px;right:8px;bottom:6px;display:flex;flex-wrap:wrap;justify-content:center;gap:2px;font-size:clamp(20px,2vw,32px);line-height:1}
+  .zone.hover{transform:scale(1.04);border-style:solid;border-color:#fff}
+  .zone.right{border-style:solid;border-color:var(--ok);box-shadow:0 0 0 6px rgba(61,220,132,.5) inset}
+  .zone.wrongz{animation:shake .4s;border-style:solid;border-color:var(--bad)}
+  .zone.show{animation:glow 1s infinite;border-style:solid;border-color:var(--yellow)}
+  @keyframes glow{50%{box-shadow:0 0 0 10px rgba(255,197,61,.55) inset}}
+  @keyframes shake{0%,100%{transform:none}20%{transform:translateX(-14px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
+
+  .fact{position:absolute;left:50%;top:8px;transform:translateX(-50%) translateY(-10px);opacity:0;transition:.3s;background:var(--panel2);border:3px solid var(--line);border-radius:22px;padding:10px 24px;font-size:clamp(18px,1.8vw,30px);font-weight:900;text-align:center;max-width:92%;z-index:4}
+  .fact.show{opacity:1;transform:translateX(-50%)}
+  .fact.ok{border-color:var(--ok)} .fact.bad{border-color:var(--yellow)}
+
+  .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(10,17,36,.8);z-index:30;border-radius:24px}
+  .overlay.show{display:grid}
+  .endcard{background:var(--panel);border:4px solid var(--line);border-radius:32px;padding:clamp(24px,3vw,44px);text-align:center;min-width:min(760px,92vw);animation:pop2 .5s ease-out both}
+  @keyframes pop2{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.05);opacity:1}100%{transform:scale(1)}}
+  .endcard .trophy{font-size:clamp(70px,8vw,130px);line-height:1}
+  .endcard h2{font-size:clamp(34px,4.2vw,76px);font-weight:900;margin:8px 0 14px}
+  .endcard p{font-size:clamp(20px,2vw,32px);font-weight:800;color:var(--muted);margin-bottom:22px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0 24px}
+  .stat{border-radius:20px;padding:14px;font-size:clamp(18px,1.6vw,26px);font-weight:800;color:#fff}
+  .stat b{display:block;font-size:1.4em;font-weight:900}
+  .stat.l{background:var(--L)} .stat.r{background:var(--R)}
+  .endbtns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="iconbtn" href="index.html" title="Bosh sahifa">🏠</a>
+    <h1>Tabiat <span>sirlari</span></h1>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="btnSound" title="Ovoz">🔊</button>
+  </header>
+
+  <!-- Sozlash -->
+  <section id="setup">
+    <div class="card">
+      <h2>🌱 Tabiat sirlari</h2>
+      <p class="lead">Rasmni barmoq bilan to'g'ri uyiga sudrab qo'ying! Har bir javobdan keyin qiziqarli fakt chiqadi.</p>
+      <div class="opt" style="border-top:0"><label>Kim o'ynaydi?</label><div class="seg" id="segMode"></div></div>
+      <div class="teams" id="teams">
+        <div class="tname l">🔴<input id="nameL" maxlength="14"></div>
+        <div class="tname r">🔵<input id="nameR" maxlength="14"></div>
+      </div>
+      <div class="opt"><label>Mavzu</label><div class="seg" id="segTopic"></div></div>
+      <div class="opt"><label>Savollar soni</label><div class="seg" id="segCount"></div></div>
+      <div class="go"><button class="btn main" id="btnStart">▶ Boshlash</button></div>
+    </div>
+  </section>
+
+  <!-- O'yin -->
+  <section id="game" hidden>
+    <div class="top" id="top"></div>
+    <div class="question" id="question"></div>
+    <div class="stage" id="stage">
+      <div class="fact" id="fact"></div>
+      <div class="item" id="item"></div>
+      <div class="hand">👆 Rasmni to'g'ri qutiga sudrang</div>
+    </div>
+    <div class="zones" id="zones"></div>
+
+    <div class="overlay" id="ovEnd">
+      <div class="endcard">
+        <div class="trophy" id="endIco">🏆</div>
+        <h2 id="endTitle"></h2>
+        <div class="stats" id="endStats"></div>
+        <p id="endText"></p>
+        <div class="endbtns">
+          <button class="btn main" id="btnAgain">🔁 Qayta o'ynash</button>
+          <button class="btn" id="btnSetup">⚙️ Sozlamalar</button>
+          <a class="btn" href="index.html">🏠 Bosh sahifa</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<canvas id="confetti"></canvas>
+
+<script>
+const $=id=>document.getElementById(id);
+
+// ---------- Mavzular: qutilar va [rasm, nomi, quti, fakt] ----------
+const TOPICS={
+  home:{name:"🏡 Kim qayerda yashaydi?",q:"Bu jonzot <span>qayerda</span> yashaydi?",
+    zones:{forest:["🌲","O'rmon","#2e8b57"],water:["🌊","Suv","#1f7fd1"],desert:["🏜️","Cho'l","#d08a2e"],polar:["❄️","Qutb","#5aa9c9"],farm:["🏡","Ferma","#8a5cc7"]},
+    items:[
+      ["🐻","Ayiq","forest","Ayiq qishda uyaga kirib, bahorgacha uxlaydi."],
+      ["🦊","Tulki","forest","Tulki juda ziyrak — sichqonni qor ostidan ham eshitadi."],
+      ["🐿️","Olmaxon","forest","Olmaxon qish uchun yong'oqlarni yerga ko'mib qo'yadi."],
+      ["🦉","Boyo'g'li","forest","Boyo'g'li boshini deyarli orqasigacha bura oladi."],
+      ["🐺","Bo'ri","forest","Bo'rilar to'da bo'lib yashaydi va uvillab gaplashadi."],
+      ["🦌","Kiyik","forest","Erkak kiyikning shoxlari har yili tushib, yangisi o'sadi."],
+      ["🐬","Delfin","water","Delfin baliq emas — u suvda yashovchi sutemizuvchi."],
+      ["🐙","Sakkizoyoq","water","Sakkizoyoqning uchta yuragi bor!"],
+      ["🦈","Akula","water","Akulaning tishlari butun umri davomida yangilanib turadi."],
+      ["🐳","Kit","water","Ko'k kit — Yerdagi eng katta hayvon."],
+      ["🦀","Qisqichbaqa","water","Qisqichbaqa yonboshlab yuradi."],
+      ["🐫","Tuya","desert","Tuya bir necha kun suv ichmasdan yura oladi."],
+      ["🦂","Chayon","desert","Chayon ultrabinafsha nurda yaltirab ko'rinadi."],
+      ["🦎","Kaltakesak","desert","Ba'zi kaltakesaklar dumini tashlab qochib qoladi."],
+      ["🐧","Pingvin","polar","Pingvin ucholmaydi, lekin juda yaxshi suzadi."],
+      ["🐻‍❄️","Oq ayiq","polar","Oq ayiqning terisi aslida qora rangda."],
+      ["🦭","Tyulen","polar","Tyulen suv ostida 20 daqiqagacha nafas olmay tura oladi."],
+      ["🐮","Sigir","farm","Sigir kuniga 20 litrgacha sut beradi."],
+      ["🐑","Qo'y","farm","Qo'yning junidan issiq kiyimlar to'qiladi."],
+      ["🐔","Tovuq","farm","Tovuq deyarli har kuni tuxum qo'yadi."],
+      ["🐴","Ot","farm","Ot tik turgan holda ham uxlay oladi."],
+      ["🐐","Echki","farm","Echki tik qoyalarga ham chiqa oladi."]]},
+  food:{name:"🍽️ Kim nima yeydi?",q:"Bu hayvon <span>nima</span> yeydi?",
+    zones:{herb:["🌿","O'txo'r","#3b9d4a"],carn:["🍖","Go'shtxo'r","#c8463a"],omni:["🥗","Hammaxo'r","#c7892a"]},
+    items:[
+      ["🐮","Sigir","herb","Sigirning oshqozoni to'rt bo'limdan iborat."],
+      ["🐰","Quyon","herb","Quyonning tishlari umr bo'yi o'sib turadi."],
+      ["🦒","Jirafa","herb","Jirafa baland daraxtlarning barglarini yeydi."],
+      ["🐘","Fil","herb","Fil kuniga 150 kg gacha o't va barg yeydi."],
+      ["🦓","Zebra","herb","Har bir zebraning chiziqlari boshqalarnikidan farq qiladi."],
+      ["🐑","Qo'y","herb","Qo'y kun bo'yi o't chimdib yuradi."],
+      ["🦁","Sher","carn","Sher 'hayvonlar shohi' deyiladi, u go'sht bilan oziqlanadi."],
+      ["🐯","Yo'lbars","carn","Yo'lbars mushuksimonlarning eng kattasi."],
+      ["🐺","Bo'ri","carn","Bo'ri o'ljasini to'da bo'lib ovlaydi."],
+      ["🦅","Burgut","carn","Burgut o'ljasini juda baland osmondan ko'radi."],
+      ["🐊","Timsoh","carn","Timsoh 100 million yildan beri deyarli o'zgarmagan."],
+      ["🦈","Akula","carn","Akula qonni suvda juda uzoqdan seza oladi."],
+      ["🐻","Ayiq","omni","Ayiq baliq ham, asal va rezavorlar ham yeydi."],
+      ["🐷","Cho'chqa","omni","Cho'chqa juda aqlli hayvon hisoblanadi."],
+      ["🐔","Tovuq","omni","Tovuq don ham, qurt-qumursqa ham yeydi."],
+      ["🦝","Yenot","omni","Yenot ovqatini ko'pincha suvda chayib yeydi."],
+      ["🐒","Maymun","omni","Maymunlar meva va hasharotlarni yaxshi ko'radi."]]},
+  season:{name:"🍂 Yil fasllari",q:"Bu <span>qaysi faslga</span> mos?",
+    zones:{winter:["❄️","Qish","#4f8fd6"],spring:["🌷","Bahor","#3fae6a"],summer:["☀️","Yoz","#e0a020"],autumn:["🍂","Kuz","#c8642a"]},
+    items:[
+      ["⛄","Qorbobo (qor odam)","winter","Qishda qordan qor odam yasaymiz."],
+      ["🛷","Chana","winter","Qishda tepalikdan chanada uchamiz."],
+      ["🧤","Qo'lqop","winter","Qishda qo'llarimizni qo'lqop isitadi."],
+      ["🎄","Archa","winter","Yangi yil qishda — 1-yanvarda nishonlanadi."],
+      ["🌷","Lola","spring","Lolalar bahorda, birinchilardan bo'lib ochiladi."],
+      ["🌱","Maysa","spring","Bahorda yer uyg'onib, maysalar ko'karadi."],
+      ["🐣","Jo'ja","spring","Bahorda ko'plab jo'jalar tuxumdan chiqadi."],
+      ["🌸","Gullagan daraxt","spring","Bahorda o'rik va olcha oppoq gullaydi."],
+      ["🏖️","Dengiz sohili","summer","Yozda dengizda cho'milamiz."],
+      ["🍉","Tarvuz","summer","Tarvuz yozning eng shirin mevasi."],
+      ["🍦","Muzqaymoq","summer","Issiq yozda muzqaymoq rohat bag'ishlaydi."],
+      ["🏊","Suzish","summer","Yozgi ta'tilda hovuzda suzamiz."],
+      ["🍁","Sariq barg","autumn","Kuzda barglar sarg'ayib to'kiladi."],
+      ["🍎","Olma terish","autumn","Kuzda bog'larda olma terimi boshlanadi."],
+      ["🎒","Maktabga qaytish","autumn","O'qish yili 2-sentabrda — kuzda boshlanadi."],
+      ["🍇","Uzum","autumn","Kuzda uzumlar pishib, shirin bo'ladi."]]},
+  alive:{name:"🌱 Tirik yoki jonsiz?",q:"Bu <span>tirikmi</span> yoki jonsizmi?",
+    zones:{alive:["🌱","Tirik","#3b9d4a"],thing:["🪨","Jonsiz","#7a7f92"]},
+    items:[
+      ["🌳","Daraxt","alive","Daraxt nafas oladi, o'sadi — demak tirik."],
+      ["🌻","Kungaboqar","alive","Kungaboqar boshini Quyosh tomon buradi."],
+      ["🐞","Xonqizi","alive","Xonqizi o'simlik zararkunandalarini yeb, bog'ni himoya qiladi."],
+      ["🍄","Qo'ziqorin","alive","Qo'ziqorin o'simlik ham, hayvon ham emas — u alohida tirik olam."],
+      ["🐟","Baliq","alive","Baliq suvdagi kislorod bilan jabrasi orqali nafas oladi."],
+      ["🧒","Bola","alive","Inson ham tirik — u o'sadi, nafas oladi, ovqatlanadi."],
+      ["🐝","Asalari","alive","Asalarilar gullarni changlatib, asal yig'adi."],
+      ["🪨","Tosh","thing","Tosh o'smaydi va nafas olmaydi — u jonsiz."],
+      ["⚽","To'p","thing","To'pni inson yasagan, u jonsiz."],
+      ["🚗","Mashina","thing","Mashina harakatlansa ham, tirik emas — uni motor yurgizadi."],
+      ["📱","Telefon","thing","Telefon gapiradi, lekin tirik emas!"],
+      ["☁️","Bulut","thing","Bulut — havodagi mayda suv tomchilari."],
+      ["💧","Suv tomchisi","thing","Suv tirik emas, lekin hamma tiriklarga kerak."],
+      ["🪑","Stul","thing","Stul yog'ochdan yasalgan, endi u jonsiz buyum."]]},
+};
+
+// ---------- Sozlamalar ----------
+const defaults={names:["Qizillar","Ko'klar"],teams:true,topic:"home",count:10,sound:true};
+let S={...defaults};
+try{ S={...defaults,...JSON.parse(localStorage.getItem("aqlli-sinf-tabiat")||"{}")}; }catch(e){}
+if(!TOPICS[S.topic]) S.topic=defaults.topic;
+const save=()=>{ try{ localStorage.setItem("aqlli-sinf-tabiat",JSON.stringify(S)); }catch(e){} };
+
+function rnd(n){ const max=Math.floor(0x100000000/n)*n, a=new Uint32Array(1); do{crypto.getRandomValues(a);}while(a[0]>=max); return a[0]%n; }
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+// ---------- Ovoz ----------
+let AC=null;
+function tone(f,d=.1,type="sine",v=.15,w=0){
+  if(!S.sound) return;
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+  const t=AC.currentTime+w,o=AC.createOscillator(),g=AC.createGain();
+  o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02);
+}
+const sOk=()=>{tone(660,.1,"triangle",.18);tone(990,.14,"triangle",.18,.08);};
+const sBad=()=>tone(150,.3,"sawtooth",.12);
+const sWin=()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,.3,"triangle",.2,i*.12));
+
+// ---------- Sozlash ekrani ----------
+function seg(el,items,get,set){
+  el.innerHTML="";
+  items.forEach(([val,label])=>{
+    const b=document.createElement("button"); b.textContent=label;
+    b.classList.toggle("on",get()===val);
+    b.onclick=()=>{ set(val); save(); renderSetup(); };
+    el.appendChild(b);
+  });
+}
+function renderSetup(){
+  $("nameL").value=S.names[0]; $("nameR").value=S.names[1];
+  seg($("segMode"),[[true,"🔴🔵 Ikki jamoa"],[false,"🏫 Butun sinf"]],()=>S.teams,v=>S.teams=v);
+  $("teams").hidden=!S.teams;
+  seg($("segTopic"),Object.entries(TOPICS).map(([k,v])=>[k,v.name]),()=>S.topic,v=>S.topic=v);
+  const max=TOPICS[S.topic].items.length;
+  seg($("segCount"),[[10,"10"],[14,"14"],[0,`Hammasi (${max})`]],()=>S.count,v=>S.count=v);
+}
+$("nameL").oninput=e=>{S.names[0]=e.target.value;save();};
+$("nameR").oninput=e=>{S.names[1]=e.target.value;save();};
+
+// ---------- Holat ----------
+let G=null; // {topic, deck, i, turn, score:[0,0], ok, bad, miss, busy}
+
+function show(id){ ["setup","game"].forEach(s=>$(s).hidden=s!==id); }
+function startGame(){
+  S.names=[($("nameL").value.trim()||defaults.names[0]),($("nameR").value.trim()||defaults.names[1])]; save();
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  const tp=TOPICS[S.topic];
+  const n=S.count?Math.min(S.count,tp.items.length):tp.items.length;
+  G={tp,deck:shuffle(tp.items).slice(0,n),i:0,turn:0,score:[0,0],ok:0,bad:0,miss:0,busy:false,got:{}};
+  $("ovEnd").classList.remove("show");
+  $("question").innerHTML=tp.q;
+  const zk=Object.keys(tp.zones);
+  $("zones").style.gridTemplateColumns=`repeat(${zk.length},1fr)`;
+  $("zones").innerHTML=zk.map(k=>{ const [ic,nm,col]=tp.zones[k];
+    return `<div class="zone" data-z="${k}" style="background:linear-gradient(180deg,${col},${col}cc)"><div class="zi">${ic}</div><div class="zn">${nm}</div><div class="got" id="got-${k}"></div></div>`; }).join("");
+  show("game"); nextItem();
+}
+function drawTop(){
+  const total=G.deck.length, pos=Math.min(G.i+1,total);
+  let h="";
+  if(S.teams){
+    h+=`<div class="sc l${G.turn===0?" turn":""}">🔴 ${esc(S.names[0])} <b>${G.score[0]}</b></div>`;
+    h+=`<div class="sc r${G.turn===1?" turn":""}">🔵 ${esc(S.names[1])} <b>${G.score[1]}</b></div>`;
+  }else h+=`<div class="sc solo">🏫 Sinf <b>⭐ ${G.ok}</b></div>`;
+  h+=`<div class="prog">${pos} / ${total}</div>`;
+  $("top").innerHTML=h;
+}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function nextItem(){
+  if(G.i>=G.deck.length) return finish();
+  G.miss=0; G.busy=false;
+  const [emo,nm]=G.deck[G.i];
+  const it=$("item"); it.className="item"; it.style.transform="";
+  it.innerHTML=`<div class="emo">${emo}</div><div class="nm">${nm}</div>`;
+  void it.offsetWidth; it.classList.add("enter");
+  document.querySelectorAll(".zone").forEach(z=>z.classList.remove("right","wrongz","show","hover"));
+  drawTop();
+}
+
+// ---------- Sudrash (pointer events: barmoq, sichqoncha, doska qalami) ----------
+let drag=null;
+const zoneAt=(x,y)=>[...document.querySelectorAll(".zone")].find(z=>{ const r=z.getBoundingClientRect(); return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom; });
+$("item").addEventListener("pointerdown",e=>{
+  if(!G||G.busy) return;
+  e.preventDefault();
+  const it=$("item"); it.setPointerCapture(e.pointerId);
+  drag={id:e.pointerId,x0:e.clientX,y0:e.clientY};
+  it.classList.remove("enter"); it.classList.add("drag");
+  tone(520,.04,"square",.05);
+});
+$("item").addEventListener("pointermove",e=>{
+  if(!drag||e.pointerId!==drag.id) return;
+  const dx=e.clientX-drag.x0, dy=e.clientY-drag.y0;
+  $("item").style.transform=`translate(${dx}px,${dy}px) scale(.85) rotate(${Math.max(-12,Math.min(12,dx/25))}deg)`;
+  const z=zoneAt(e.clientX,e.clientY);
+  document.querySelectorAll(".zone").forEach(q=>q.classList.toggle("hover",q===z));
+});
+function endDrag(e){
+  if(!drag||e.pointerId!==drag.id) return;
+  const it=$("item"); it.classList.remove("drag");
+  const z=zoneAt(e.clientX,e.clientY); drag=null;
+  document.querySelectorAll(".zone").forEach(q=>q.classList.remove("hover"));
+  if(z) answer(z); else it.style.transform="";
+}
+$("item").addEventListener("pointerup",endDrag);
+$("item").addEventListener("pointercancel",e=>{ if(drag&&e.pointerId===drag.id){ drag=null; $("item").classList.remove("drag"); $("item").style.transform=""; } });
+// Sudrash qiyin bo'lsa — qutini shunchaki bosish ham javob hisoblanadi
+$("zones").addEventListener("pointerdown",e=>{ const z=e.target.closest(".zone"); if(z&&!drag&&G&&!G.busy){ e.preventDefault(); answer(z); } });
+
+// ---------- Javob ----------
+function answer(z){
+  if(G.busy) return;
+  const [emo,nm,key,fact]=G.deck[G.i], it=$("item");
+  if(z.dataset.z===key){
+    G.busy=true; G.ok++; if(S.teams) G.score[G.turn]++;
+    sOk(); z.classList.add("right");
+    $("got-"+key).insertAdjacentHTML("beforeend",`<span>${emo}</span>`);
+    it.classList.add("gone");
+    showFact("✅ "+fact,"ok");
+    drawTop();
+    setTimeout(advance,2300);
+  }else{
+    G.bad++; G.miss++; sBad();
+    z.classList.remove("wrongz"); void z.offsetWidth; z.classList.add("wrongz");
+    it.style.transform="";
+    if(G.miss>=2){
+      G.busy=true;
+      const right=document.querySelector(`.zone[data-z="${key}"]`); right.classList.add("show");
+      showFact(`💡 To'g'ri javob: ${G.tp.zones[key][1]}. ${fact}`,"bad");
+      setTimeout(advance,3200);
+    }else showFact("❌ Yana bir bor urinib ko'ring!","bad",1200);
+  }
+}
+function advance(){ G.i++; if(S.teams) G.turn=1-G.turn; nextItem(); }
+let factT=null;
+function showFact(text,kind,ms=2200){
+  const f=$("fact"); f.textContent=text; f.className="fact show "+kind;
+  clearTimeout(factT); factT=setTimeout(()=>f.classList.remove("show"),ms);
+}
+
+// ---------- Yakun ----------
+function finish(){
+  const total=G.deck.length;
+  let w=-1;
+  if(S.teams){
+    w=G.score[0]>G.score[1]?0:G.score[1]>G.score[0]?1:-1;
+    $("endIco").textContent=w<0?"🤝":"🏆";
+    $("endTitle").textContent=w<0?"Durrang!":`${S.names[w]} g'olib!`;
+    $("endTitle").style.color=w===0?"var(--L)":w===1?"var(--R)":"var(--yellow)";
+    $("endStats").hidden=false;
+    $("endStats").innerHTML=`<div class="stat l">${esc(S.names[0])}<b>✓ ${G.score[0]}</b></div><div class="stat r">${esc(S.names[1])}<b>✓ ${G.score[1]}</b></div>`;
+    $("endText").textContent=`Jami ${total} ta savol`;
+  }else{
+    const pct=G.ok/total;
+    $("endIco").textContent=pct>=.9?"🏆":pct>=.6?"🌟":"💪";
+    $("endTitle").textContent=pct>=.9?"Ajoyib!":pct>=.6?"Barakalla!":"Yaxshi urinish!";
+    $("endTitle").style.color="var(--teal)";
+    $("endStats").hidden=true;
+    $("endText").textContent=`${total} tadan ${G.ok} tasi to'g'ri topildi ⭐`;
+  }
+  $("ovEnd").classList.add("show");
+  if(w>=0||!S.teams){ sWin(); confetti(w===0?["#ff6b5e","#ffc53d","#fff"]:w===1?["#5b8cff","#ffc53d","#fff"]:["#2fd3b5","#ffc53d","#fff"]); }
+  else tone(440,.4,"triangle",.15);
+}
+function confetti(cols){
+  const c=$("confetti"),x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const P=Array.from({length:200},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,vx:(Math.random()-.5)*6,vy:Math.random()*4+3,r:Math.random()*9+6,c:cols[Math.random()*cols.length|0],a:Math.random()*6}));
+  const t0=performance.now();
+  (function step(t){ x.clearRect(0,0,c.width,c.height);
+    P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=.15;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore();});
+    if(t-t0<4000) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height); })(t0);
+}
+
+// ---------- Tugmalar ----------
+$("btnStart").onclick=startGame;
+$("btnAgain").onclick=startGame;
+$("btnSetup").onclick=()=>{ renderSetup(); show("setup"); };
+function soundIcon(){ $("btnSound").textContent=S.sound?"🔊":"🔇"; }
+$("btnSound").onclick=()=>{ S.sound=!S.sound; save(); soundIcon(); };
+renderSetup(); soundIcon();
+</script>
+</body>
+</html>

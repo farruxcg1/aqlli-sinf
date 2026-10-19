@@ -27,13 +27,13 @@
   .clock b{display:block;font-size:clamp(36px,4.2vw,64px);font-weight:900;line-height:1}
   .clock span{color:var(--muted);font-weight:800;font-size:clamp(14px,1.3vw,20px)}
 
-  .grid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:22px;min-height:0}
-  .tile{position:relative;border-radius:30px;padding:clamp(18px,2.4vw,36px);display:flex;flex-direction:column;justify-content:flex-end;gap:8px;text-decoration:none;color:#14182b;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.35);transition:transform .12s}
+  .grid{flex:1;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,1fr);gap:22px;min-height:0}
+  .tile{position:relative;border-radius:30px;padding:clamp(14px,1.8vw,28px);display:flex;flex-direction:column;justify-content:flex-end;gap:8px;text-decoration:none;color:#14182b;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.35);transition:transform .12s}
   .tile:active{transform:translateY(6px);box-shadow:0 4px 0 rgba(0,0,0,.35)}
   /* ikon oqim ichida turadi va matnni pastga suradi — uzun nom ustma-ust tushmaydi */
   .tile .ico{margin-bottom:auto;font-size:clamp(44px,min(7vw,11vh),110px);line-height:1;filter:drop-shadow(0 6px 0 rgba(0,0,0,.15))}
-  .tile h2{font-size:clamp(24px,min(3vw,5vh),48px);font-weight:900;line-height:1.05}
-  .tile p{font-size:clamp(15px,1.4vw,22px);font-weight:800;opacity:.75}
+  .tile h2{font-size:clamp(20px,min(2.2vw,4.6vh),42px);font-weight:900;line-height:1.05}
+  .tile p{font-size:clamp(14px,1.2vw,20px);font-weight:800;opacity:.75}
   .t1{background:var(--yellow)}
   .t2{background:linear-gradient(90deg,var(--coral) 0 50%,var(--blue) 50% 100%)}
   .t2 h2,.t2 p{color:#fff}
@@ -41,6 +41,8 @@
   .t3 h2,.t3 p{color:#fff}
   .t4{background:linear-gradient(135deg,#2fd3b5,#1f9e86)} .t4 h2,.t4 p{color:#06231d}
   .t5{background:linear-gradient(135deg,#ffcf40,#ff9f43)}
+  .t6{background:linear-gradient(135deg,#ff8fb1,#e8457a)} .t6 h2,.t6 p{color:#fff}
+  .t7{background:linear-gradient(135deg,#7ad66b,#2e9e5b)} .t7 h2,.t7 p{color:#0b2a14}
   .soon{background:var(--panel);color:var(--muted);box-shadow:none;border:3px dashed var(--line);pointer-events:none}
   .soon .ico{opacity:.45;filter:grayscale(.6)}
   .badge{position:absolute;top:clamp(16px,2vw,28px);right:clamp(16px,2vw,28px);background:var(--panel2);color:var(--muted);padding:6px 14px;border-radius:999px;font-size:clamp(13px,1.1vw,18px);font-weight:900}
@@ -77,6 +79,18 @@
       <div class="ico">🎡</div>
       <h2>Savollar barabani</h2>
       <p>Geografiya fanidan savollar</p>
+    </a>
+    <a class="tile t6" href="soz-ovchisi.html">
+      <span class="badge new">YANGI</span>
+      <div class="ico">🔤</div>
+      <h2>So'z ovchisi</h2>
+      <p>Ingliz tili poygasi</p>
+    </a>
+    <a class="tile t7" href="tabiat-sirlari.html">
+      <span class="badge new">YANGI</span>
+      <div class="ico">🌱</div>
+      <h2>Tabiat sirlari</h2>
+      <p>Rasmni to'g'ri joyga sudrang</p>
     </a>
     <div class="tile soon"><span class="badge">Tez kunda</span><div class="ico">📒</div><h2>Sinf daftari</h2><p>O'quvchilarga yulduz berish</p></div>
     <div class="tile soon"><span class="badge">Tez kunda</span><div class="ico">🏆</div><h2>Sinflar reytingi</h2><p>Haftaning eng faol sinfi</p></div>
