@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qur'a — Aqlli sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101a33; --panel:#1a2747; --panel2:#24345c; --line:#33467a;
+    --text:#f4f6ff; --muted:#a9b4d6;
+    --yellow:#ffc53d; --teal:#2fd3b5; --coral:#ff6b5e; --blue:#5b8cff; --violet:#a78bfa; --green:#7ad66b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:Nunito,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  header{display:flex;align-items:center;gap:14px;padding:10px 20px;flex-wrap:wrap}
+  header h1{font-size:clamp(22px,2.4vw,38px);font-weight:900}
+  header h1 span{color:var(--yellow)}
+  .spacer{flex:1}
+  .iconbtn{width:58px;height:58px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:26px;display:grid;place-items:center;text-decoration:none;color:inherit}
+  .iconbtn:active{transform:scale(.95)}
+  .classchip{display:flex;align-items:center;gap:10px;height:58px;padding:0 20px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:clamp(18px,1.7vw,26px);font-weight:900;white-space:nowrap}
+  .classchip b{color:var(--yellow)}
+  .classchip:active{transform:scale(.97)}
+
+  .tabs{display:flex;gap:10px;padding:0 20px 10px}
+  .tab{flex:1;max-width:340px;min-height:60px;border-radius:18px;background:var(--panel);border:2px solid var(--line);font-size:clamp(17px,1.6vw,24px);font-weight:900;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:10px}
+  .tab.on{background:var(--yellow);color:#1b1b1b;border-color:#e0a920}
+
+  main{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 20px 18px}
+  section{flex:1;min-height:0;display:flex;flex-direction:column}
+  section[hidden]{display:none!important}
+
+  /* ---------- Bitta o'quvchi ---------- */
+  .pickstage{flex:1;min-height:0;display:grid;place-items:center;position:relative}
+  .card-kid{display:flex;flex-direction:column;align-items:center;gap:10px;padding:clamp(20px,3vw,46px) clamp(30px,5vw,80px);border-radius:40px;background:#fff;color:#14182b;box-shadow:0 16px 0 rgba(0,0,0,.35);min-width:min(60vw,520px)}
+  .card-kid .emo{font-size:clamp(90px,min(16vw,30vh),240px);line-height:1}
+  .card-kid .nm{font-size:clamp(30px,4vw,72px);font-weight:900;text-align:center;line-height:1.05}
+  .card-kid.rolling{animation:wob .25s infinite alternate}
+  @keyframes wob{from{transform:translateY(-4px) rotate(-1.2deg)}to{transform:translateY(4px) rotate(1.2deg)}}
+  .card-kid.win{animation:pop2 .6s ease-out both}
+  @keyframes pop2{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.07);opacity:1}100%{transform:scale(1)}}
+  .emptymsg{text-align:center;color:var(--muted);font-size:clamp(20px,2.2vw,34px);font-weight:800;padding:24px;line-height:1.4}
+  .emptymsg a{color:var(--yellow)}
+
+  /* ---------- Jamoalar ---------- */
+  .teamswrap{flex:1;min-height:0;display:grid;gap:14px;grid-auto-flow:column;grid-auto-columns:1fr}
+  .tcol{min-width:0;border-radius:26px;border:4px solid;display:flex;flex-direction:column;overflow:hidden}
+  .tcol .th{padding:10px;text-align:center;font-size:clamp(20px,2vw,32px);font-weight:900;color:#0e1630}
+  .tcol .tb{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:6px;padding:10px}
+  .tmem{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:14px;padding:8px 12px;font-size:clamp(16px,1.5vw,24px);font-weight:800}
+  .tmem .a{font-size:1.5em;line-height:1}
+  .teamswrap.empty{place-items:center;display:grid}
+
+  footer{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;padding-top:14px}
+  .btn{min-height:78px;padding:0 38px;border-radius:24px;font-size:clamp(20px,2.1vw,32px);font-weight:900;display:inline-flex;align-items:center;gap:12px;background:var(--panel2);border:3px solid var(--line);box-shadow:0 6px 0 rgba(0,0,0,.35)}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+  .btn.main{background:var(--yellow);color:#1b1b1b;border-color:#e0a920}
+  .btn.go{background:var(--teal);color:#062a23;border-color:#1fb196}
+  .btn[hidden]{display:none}
+  .btn:disabled{opacity:.5}
+  .opt{display:flex;align-items:center;gap:10px;font-size:clamp(16px,1.5vw,22px);font-weight:900;color:var(--muted)}
+  .seg{display:flex;gap:6px;background:var(--panel);padding:6px;border-radius:16px}
+  .seg button{min-width:56px;height:52px;border-radius:12px;font-size:22px;font-weight:900;color:var(--muted)}
+  .seg button.on{background:var(--yellow);color:#1b1b1b}
+  .toggle{width:76px;height:44px;border-radius:999px;background:var(--panel);position:relative;border:2px solid var(--line)}
+  .toggle::after{content:"";position:absolute;top:4px;left:5px;width:32px;height:32px;border-radius:50%;background:var(--muted);transition:.2s}
+  .toggle.on{background:var(--teal)}
+  .toggle.on::after{left:36px;background:#fff}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:20}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="iconbtn" href="index.html" title="Bosh sahifa">🏠</a>
+    <h1>Qur'<span>a</span></h1>
+    <div class="spacer"></div>
+    <button class="classchip" id="classChip" title="Sinfni almashtirish">🏫 <b id="className">—</b></button>
+    <button class="iconbtn" id="btnSound" title="Ovoz">🔊</button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" id="tabPick">🎯 Bitta o'quvchi</button>
+    <button class="tab" id="tabTeams">👥 Jamoalarga bo'lish</button>
+  </div>
+
+  <main>
+    <!-- Bitta o'quvchi -->
+    <section id="pick">
+      <div class="pickstage">
+        <div class="card-kid" id="kidCard" hidden><div class="emo" id="kidEmo">🎲</div><div class="nm" id="kidName"></div></div>
+        <div class="emptymsg" id="pickEmpty" hidden></div>
+      </div>
+      <footer>
+        <label class="opt"><span>Takrorlanmasin</span><button class="toggle" id="tgNoRepeat"></button></label>
+        <button class="btn go" id="btnRoll">🎲 Tanlash</button>
+        <button class="btn" id="btnStar" hidden>⭐ Yulduz berish</button>
+      </footer>
+    </section>
+
+    <!-- Jamoalar -->
+    <section id="teams" hidden>
+      <div class="teamswrap" id="teamsWrap"></div>
+      <footer>
+        <span class="opt">Nechta jamoa</span>
+        <div class="seg" id="segTeams"></div>
+        <button class="btn go" id="btnSplit">🎲 Bo'lish</button>
+      </footer>
+    </section>
+  </main>
+</div>
+<canvas id="confetti"></canvas>
+
+<script src="js/config.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+
+// ---------- Tasodif (crypto) ----------
+function rnd(n){ const max=Math.floor(0x100000000/n)*n, a=new Uint32Array(1); do{crypto.getRandomValues(a);}while(a[0]>=max); return a[0]%n; }
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+// ---------- Sozlamalar (ovoz, takrorlanmaslik, jamoalar soni) ----------
+const defaults={sound:true,noRepeat:true,teams:2};
+let S={...defaults};
+try{ S={...defaults,...JSON.parse(localStorage.getItem("aqlli-qura")||"{}")}; }catch(e){}
+const save=()=>{ try{ localStorage.setItem("aqlli-qura",JSON.stringify(S)); }catch(e){} };
+
+// ---------- Ovoz ----------
+let AC=null;
+function tone(f,d=.08,type="square",v=.1,w=0){
+  if(!S.sound) return;
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+  const t=AC.currentTime+w,o=AC.createOscillator(),g=AC.createGain();
+  o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02);
+}
+const sWin=()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,"triangle",.18,i*.11));
+
+// ---------- Holat ----------
+const TEAM_COLORS=[["var(--coral)","#2a0f0c"],["var(--blue)","#0a1733"],["var(--green)","#0b2a14"],["var(--yellow)","#2a2206"],["var(--violet)","#1c1340"],["var(--teal)","#06231d"]];
+let cls=null, students=[], picked=new Set(), rolling=false, last=null;
+
+async function boot(){
+  await AqlliUI.ensureReady();
+  const classes=await S_classes();
+  if(!classes.length){ showEmpty(); return; }
+  const want=AqlliUI.lastClass.get();
+  cls=classes.find(c=>c.id===want)||classes[0];
+  await loadClass();
+}
+async function S_classes(){ try{ return await AqlliStore.classes(); }catch(e){ return []; } }
+
+async function loadClass(){
+  AqlliUI.lastClass.set(cls.id);
+  $("className").textContent=`${cls.grade}-${cls.letter}`;
+  try{ students=await AqlliStore.students(cls.id); }catch(e){ students=[]; }
+  picked=new Set(); last=null;
+  resetPickCard(); renderTeams(true);
+}
+function showEmpty(){
+  $("kidCard").hidden=true;
+  const e=$("pickEmpty"); e.hidden=false;
+  e.innerHTML='Hali sinf yoki o\'quvchi yo\'q.<br>Avval <a href="sinf-daftari.html">Sinf daftari</a>da sinf va o\'quvchilarni qo\'shing.';
+  $("btnRoll").disabled=true; $("btnSplit").disabled=true;
+}
+
+// ---------- Bitta o'quvchi ----------
+function resetPickCard(){
+  $("pickEmpty").hidden=true; $("btnStar").hidden=true;
+  const card=$("kidCard"); card.hidden=false; card.className="card-kid";
+  $("kidEmo").textContent="🎲"; $("kidName").textContent=students.length?"Tanlashga tayyor":"Bu sinfda o'quvchi yo'q";
+  $("btnRoll").disabled=!students.length;
+}
+function pool(){
+  const act=students;
+  if(!S.noRepeat) return act;
+  const left=act.filter(s=>!picked.has(s.id));
+  return left.length?left:act;   // hamma chiqib bo'lsa — yangi davra
+}
+async function roll(){
+  if(rolling||!students.length) return;
+  const avail=pool();
+  if(S.noRepeat && picked.size>=students.length){ picked=new Set(); AqlliUI.toast("🔄 Hamma chiqib bo'ldi — yangi davra!"); }
+  const winner=avail[rnd(avail.length)];
+  rolling=true; $("btnRoll").disabled=true; $("btnStar").hidden=true;
+  const card=$("kidCard"); card.className="card-kid rolling";
+  const steps=18+rnd(8);
+  let prev=null;
+  for(let i=0;i<steps;i++){
+    let s;
+    if(i===steps-1) s=winner;
+    else { do{ s=students[rnd(students.length)]; }while(students.length>1 && s===prev); }
+    prev=s; $("kidEmo").textContent=s.avatar; $("kidName").textContent=`${s.first_name} ${s.last_initial||""}`.trim();
+    tone(300+rnd(6)*70,.04);
+    await new Promise(r=>setTimeout(r,60+360*Math.pow(i/steps,3)));
+  }
+  last=winner; picked.add(winner.id);
+  card.className="card-kid win"; sWin(); confetti();
+  $("btnRoll").disabled=false; $("btnRoll").textContent="🔁 Yana";
+  const sb=$("btnStar"); sb.hidden=false; sb.disabled=false; sb.textContent="⭐ Yulduz berish";
+  rolling=false;
+}
+$("btnStar").onclick=async()=>{
+  if(!last) return;
+  const ok=await AqlliUI.award({cls,student:last,stars:1,points:1,source:"board",reason:"Doskada to'g'ri javob"});
+  if(ok){ $("btnStar").disabled=true; $("btnStar").textContent=`✅ ${last.avatar} ${last.first_name}`; }
+};
+
+// ---------- Jamoalar ----------
+function renderTeams(placeholder){
+  const wrap=$("teamsWrap");
+  if(placeholder){
+    wrap.classList.add("empty");
+    wrap.innerHTML=`<div class="emptymsg">${students.length?`\"${cls.grade}-${cls.letter}\" — ${students.length} o'quvchi.<br>\"🎲 Bo'lish\"ni bosing.`:"Bu sinfda o'quvchi yo'q."}</div>`;
+    $("btnSplit").disabled=!students.length;
+    return;
+  }
+  wrap.classList.remove("empty");
+  const n=Math.min(S.teams,Math.max(1,students.length));
+  const groups=Array.from({length:n},()=>[]);
+  shuffle(students).forEach((s,i)=>groups[i%n].push(s));
+  wrap.innerHTML=groups.map((g,i)=>{
+    const [c,txt]=TEAM_COLORS[i%TEAM_COLORS.length];
+    return `<div class="tcol" style="border-color:${c}">
+      <div class="th" style="background:${c}">${i+1}-jamoa · ${g.length}</div>
+      <div class="tb">${g.map(s=>`<div class="tmem"><span class="a">${s.avatar}</span>${AqlliUI.esc(s.first_name)} ${AqlliUI.esc(s.last_initial||"")}</div>`).join("")}</div>
+    </div>`;
+  }).join("");
+}
+function split(){
+  if(!students.length) return;
+  renderTeams(false); tone(523,.12,"triangle",.15); tone(784,.16,"triangle",.15,.08); confetti();
+}
+
+// ---------- Konfetti ----------
+function confetti(){
+  const c=$("confetti"),x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols=["#ffc53d","#ff6b5e","#2fd3b5","#5b8cff","#fff"];
+  const P=Array.from({length:140},()=>({x:c.width/2+(Math.random()-.5)*c.width*.4,y:c.height*.42,vx:(Math.random()-.5)*20,vy:-Math.random()*20-6,r:Math.random()*8+5,c:cols[Math.random()*5|0],a:Math.random()*6}));
+  const t0=performance.now();
+  (function step(t){ x.clearRect(0,0,c.width,c.height);
+    P.forEach(p=>{p.vy+=.55;p.x+=p.vx;p.y+=p.vy;p.a+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore();});
+    if(t-t0<2800) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height); })(t0);
+}
+
+// ---------- Tablar ----------
+function tab(which){
+  const p=which==="pick";
+  $("tabPick").classList.toggle("on",p); $("tabTeams").classList.toggle("on",!p);
+  $("pick").hidden=!p; $("teams").hidden=p;
+}
+$("tabPick").onclick=()=>tab("pick");
+$("tabTeams").onclick=()=>tab("teams");
+
+// ---------- Sinfni almashtirish ----------
+$("classChip").onclick=async()=>{
+  const c=await AqlliUI.pickClass({title:"Qaysi sinf?"}); if(!c) return;
+  cls=c; await loadClass();
+};
+
+// ---------- Sozlamalar UI ----------
+function seg(el,vals,key){
+  el.innerHTML="";
+  vals.forEach(v=>{ const b=document.createElement("button"); b.textContent=v; b.classList.toggle("on",S[key]===v); b.onclick=()=>{ S[key]=v; save(); seg(el,vals,key); if(!$("teams").hidden&&!$("teamsWrap").classList.contains("empty")) renderTeams(false); }; el.appendChild(b); });
+}
+function soundIcon(){ $("btnSound").textContent=S.sound?"🔊":"🔇"; }
+$("btnSound").onclick=()=>{ S.sound=!S.sound; save(); soundIcon(); };
+$("tgNoRepeat").classList.toggle("on",S.noRepeat);
+$("tgNoRepeat").onclick=()=>{ S.noRepeat=!S.noRepeat; save(); $("tgNoRepeat").classList.toggle("on",S.noRepeat); };
+$("btnRoll").onclick=()=>{ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} roll(); };
+$("btnSplit").onclick=()=>{ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} split(); };
+addEventListener("keydown",e=>{ if(e.code==="Space"){ e.preventDefault(); if($("teams").hidden) roll(); else split(); } });
+
+seg($("segTeams"),[2,3,4],"teams"); soundIcon();
+boot();
+</script>
+<script>if('serviceWorker'in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
+</body>
+</html>

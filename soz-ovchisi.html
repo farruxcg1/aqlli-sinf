@@ -472,5 +472,6 @@ document.addEventListener("visibilitychange",()=>{ if(document.hidden) pause(); 
 
 renderSetup(); soundIcon();
 </script>
+<script>if('serviceWorker'in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
 </body>
 </html>

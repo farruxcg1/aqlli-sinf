@@ -82,7 +82,7 @@
 
   /* Rasm sahnasi: fotosurat siljiydi, chiziqlar joyida turadi */
   .stage{grid-column:1/-1;position:relative;height:clamp(190px,34vh,430px);border-radius:24px;overflow:hidden;border:3px solid var(--line);background:#7fc0ef}
-  .stage img{position:absolute;max-width:none;pointer-events:none;-webkit-user-drag:none;will-change:transform;transition:transform .6s cubic-bezier(.3,1.65,.5,1)}
+  .stage #scene{position:absolute;inset:0;width:100%;height:100%;display:block}
   .vline{position:absolute;top:0;bottom:0;width:0;pointer-events:none}
   .vline.c{border-left:3px solid rgba(255,255,255,.9);margin-left:-1.5px}
   .vline.l,.vline.r{border-left:5px dashed;margin-left:-2.5px;filter:drop-shadow(0 0 3px rgba(0,0,0,.5))}
@@ -146,10 +146,7 @@
   <!-- O'yin -->
   <section id="game" hidden>
     <div class="stage" id="stage">
-      <img id="photo" src="img/arqon-tortish.jpg" alt="Arqon tortish">
-      <div class="vline l" id="vl"></div>
-      <div class="vline c" id="vc"></div>
-      <div class="vline r" id="vr"></div>
+      <svg id="scene" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMax slice" aria-label="Arqon tortish"></svg>
       <div class="hud"><span class="score a" id="scA">0</span><span class="timer" id="timer">2:00</span><span class="score b" id="scB">0</span></div>
       <div class="status" id="status">🤝 Teng!</div>
     </div>
@@ -191,7 +188,6 @@
 </div>
 <canvas id="confetti"></canvas>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js"></script>
 <script src="js/config.js"></script>
 <script src="js/store.js"></script>
 <script src="js/ui.js"></script>
@@ -236,25 +232,89 @@ const sBad=()=>tone(150,.3,"sawtooth",.12);
 const sWin=()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,.3,"triangle",.2,i*.12));
 
 // ---------- Rasm sahnasi ----------
-// Fotosurat ramkadan kengroq qo'yiladi; to'g'ri javobda butun rasm siljiydi,
-// markaziy va g'alaba chiziqlari esa joyida turadi. Lenta rasmning aniq o'rtasida (x=50%, y≈55%).
-const PHOTO={ar:1916/821, ribbonY:.555, zoom:1.25};
-let maxShift=0;
-function layoutStage(){
-  const st=$("stage"), img=$("photo"), W=st.clientWidth, H=st.clientHeight;
-  if(!W||!H) return;
-  if(img.naturalWidth) PHOTO.ar=img.naturalWidth/img.naturalHeight; // har xil o'lchamdagi rasmlar uchun
-  let iw=W*PHOTO.zoom, ih=iw/PHOTO.ar;
-  if(ih<H*1.02){ ih=H*1.02; iw=ih*PHOTO.ar; }
-  img.style.width=iw+"px"; img.style.height=ih+"px";
-  img.style.left=(W-iw)/2+"px";
-  img.style.top=Math.min(0,Math.max(H-ih,H*.5-ih*PHOTO.ribbonY))+"px";
-  maxShift=(iw-W)/2*.9;
-  $("vc").style.left=W/2+"px"; $("vl").style.left=(W/2-maxShift)+"px"; $("vr").style.left=(W/2+maxShift)+"px";
-  drawRope();
-}
-addEventListener("resize",()=>{ if(!$("game").hidden) layoutStage(); });
-$("photo").addEventListener("load",()=>{ if(!$("game").hidden) layoutStage(); });
+// ---------- Multfilm arqon sahnasi (SVG, o'yin natijasiga bog'langan) ----------
+// Lenta va bolalar `pos` (arqon holati) ga qarab siljiydi/engashadi; to'g'ri javobda silkinadi.
+const SCENE=(()=>{
+  const NS="http://www.w3.org/2000/svg", OL="#20283a";
+  const GROUND=268, ROPEY=178, CENTER=500, WIN_PX=150;
+  const L="#ff6b5e", LD="#c93a30", R="#5b8cff", RD="#2f59c9";
+  const PAL=[{s:"#ffd9b3",h:"#2b2017",k:"#e23b3b"},{s:"#f1c27d",h:"#4a3220",k:"#2d6cdf"},
+             {s:"#e8b37e",h:"#141414",k:"#ffd23b"},{s:"#c98a54",h:"#3a1f12",k:"#30c070"}];
+  const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+  const add=(p,t,a)=>{const e=el(t,a);p.appendChild(e);return e;};
+  function kid(j,jD,p){
+    const g=el("g",{}),S=p.s,SD="#d9a877",H=p.h,SH=p.k;
+    add(g,"line",{x1:-2,y1:-52,x2:-13,y2:-14,stroke:SD,"stroke-width":15,"stroke-linecap":"round"});
+    add(g,"rect",{x:-25,y:-16,width:26,height:13,rx:6,fill:SH,stroke:OL,"stroke-width":2.4});
+    add(g,"line",{x1:9,y1:-54,x2:20,y2:-14,stroke:S,"stroke-width":16,"stroke-linecap":"round"});
+    add(g,"rect",{x:8,y:-16,width:30,height:13,rx:6,fill:SH,stroke:OL,"stroke-width":2.4});
+    add(g,"path",{d:"M-18,-60 Q-18,-40 -10,-40 L8,-40 Q14,-40 12,-58 Q-2,-66 -18,-60 Z",fill:"#28324d",stroke:OL,"stroke-width":2.4});
+    add(g,"polyline",{points:"-20,-98 4,-102 34,-86",fill:"none",stroke:SD,"stroke-width":11,"stroke-linecap":"round","stroke-linejoin":"round"});
+    add(g,"path",{d:"M-6,-56 C2,-72 2,-92 -10,-101 L-22,-101 C-34,-92 -32,-70 -24,-56 Q-14,-50 -6,-56 Z",fill:j,stroke:OL,"stroke-width":2.6});
+    add(g,"circle",{cx:-10,cy:-100,r:9,fill:j,stroke:OL,"stroke-width":2.4});
+    add(g,"circle",{cx:-22,cy:-100,r:9,fill:j,stroke:OL,"stroke-width":2.4});
+    add(g,"polyline",{points:"-10,-98 12,-96 34,-92",fill:"none",stroke:S,"stroke-width":11,"stroke-linecap":"round","stroke-linejoin":"round"});
+    add(g,"circle",{cx:36,cy:-88,r:8.5,fill:S,stroke:OL,"stroke-width":2.4});
+    add(g,"rect",{x:-21,y:-106,width:11,height:12,fill:SD});
+    add(g,"circle",{cx:-16,cy:-124,r:22,fill:S,stroke:OL,"stroke-width":2.6});
+    add(g,"circle",{cx:-36,cy:-122,r:6,fill:S,stroke:OL,"stroke-width":2.2});
+    add(g,"path",{d:"M-39,-126 C-42,-152 -2,-156 5,-126 C-2,-140 -12,-142 -14,-134 C-18,-142 -30,-144 -39,-126 Z",fill:H,stroke:OL,"stroke-width":2.2});
+    add(g,"circle",{cx:-3,cy:-116,r:4.5,fill:"#ff8f8f",opacity:.55});
+    add(g,"ellipse",{cx:-7,cy:-125,rx:4,ry:5,fill:"#fff",stroke:OL,"stroke-width":1.6});
+    add(g,"ellipse",{cx:-18,cy:-125,rx:4,ry:5,fill:"#fff",stroke:OL,"stroke-width":1.6});
+    add(g,"circle",{cx:-6,cy:-124,r:2.1,fill:"#1a2230"});
+    add(g,"circle",{cx:-17,cy:-124,r:2.1,fill:"#1a2230"});
+    add(g,"line",{x1:-24,y1:-134,x2:-13,y2:-131,stroke:OL,"stroke-width":2.4,"stroke-linecap":"round"});
+    add(g,"line",{x1:-11,y1:-132,x2:-1,y2:-135,stroke:OL,"stroke-width":2.4,"stroke-linecap":"round"});
+    add(g,"path",{d:"M-18,-111 Q-11,-106 -4,-111 Q-11,-108 -18,-111 Z",fill:"#7a2d2d",stroke:OL,"stroke-width":1.4});
+    return g;
+  }
+  const sc=$("scene");
+  add(sc,"rect",{x:0,y:0,width:1000,height:300,fill:"#bfe6ff"});
+  add(sc,"rect",{x:0,y:150,width:1000,height:60,fill:"#d6f0ff"});
+  add(sc,"circle",{cx:885,cy:52,r:30,fill:"#ffe27a"});
+  for(let i=0;i<12;i++){const a=i/12*6.28;add(sc,"line",{x1:885+Math.cos(a)*38,y1:52+Math.sin(a)*38,x2:885+Math.cos(a)*48,y2:52+Math.sin(a)*48,stroke:"#ffe27a","stroke-width":4,"stroke-linecap":"round"});}
+  [[180,60,1],[520,40,.8],[760,92,.9]].forEach(([x,y,s])=>{const c=el("g",{transform:`translate(${x},${y}) scale(${s})`});[[0,0,26],[34,6,22],[-30,8,20],[6,-12,18]].forEach(([dx,dy,r])=>add(c,"circle",{cx:dx,cy:dy,r,fill:"#fff"}));sc.appendChild(c);});
+  add(sc,"ellipse",{cx:250,cy:210,rx:320,ry:70,fill:"#6bbf4c"});
+  add(sc,"ellipse",{cx:820,cy:214,rx:300,ry:64,fill:"#63b544"});
+  add(sc,"rect",{x:0,y:198,width:1000,height:102,fill:"#7ec94f"});
+  for(let i=0;i<10;i++) if(i%2) add(sc,"rect",{x:i*100,y:198,width:100,height:102,fill:"#75c045"});
+  add(sc,"rect",{x:0,y:198,width:1000,height:5,fill:"#5fae45"});
+  const LX=[96,164,232,300],RX=[700,768,836,904];
+  [...LX,...RX].forEach(x=>add(sc,"ellipse",{cx:x,cy:GROUND+2,rx:40,ry:9,fill:"rgba(20,40,20,.18)"}));
+  // g'alaba chiziqlari (o'ng/chapga shuncha tortilsa — o'yin tugaydi) va markaz
+  add(sc,"line",{x1:CENTER-WIN_PX,y1:96,x2:CENTER-WIN_PX,y2:300,stroke:L,"stroke-width":4,"stroke-dasharray":"10 8"});
+  add(sc,"path",{d:`M${CENTER-WIN_PX-6},104 l-22,11 l22,11 z`,fill:L});
+  add(sc,"line",{x1:CENTER+WIN_PX,y1:96,x2:CENTER+WIN_PX,y2:300,stroke:R,"stroke-width":4,"stroke-dasharray":"10 8"});
+  add(sc,"path",{d:`M${CENTER+WIN_PX+6},104 l22,11 l-22,11 z`,fill:R});
+  const rope=add(sc,"path",{stroke:"#b5813f","stroke-width":9,fill:"none","stroke-linecap":"round"});
+  const rope2=add(sc,"path",{stroke:"#d8ab66","stroke-width":9,fill:"none","stroke-linecap":"round","stroke-dasharray":"2 12"});
+  function team(xs,dir,j,jD){return xs.map((bx,i)=>{const o=el("g",{});o.appendChild(kid(j,jD,PAL[i%4]));sc.appendChild(o);return{o,bx,dir,ph:Math.random()*6.28};});}
+  const kids=[...team(LX,1,L,LD),...team(RX,-1,R,RD)];
+  add(sc,"line",{x1:CENTER,y1:112,x2:CENTER,y2:300,stroke:"rgba(255,255,255,.9)","stroke-width":3});
+  const knot=el("g",{});
+  add(knot,"path",{d:`M0,${ROPEY-34} L22,${ROPEY-27} L0,${ROPEY-20} Z`,fill:"#ff3b3b",stroke:OL,"stroke-width":2});
+  add(knot,"line",{x1:0,y1:ROPEY-36,x2:0,y2:ROPEY+14,stroke:"#3a2a1a","stroke-width":3});
+  add(knot,"rect",{x:-8,y:ROPEY-10,width:16,height:20,rx:4,fill:"#fff",stroke:"#e23","stroke-width":3});
+  sc.appendChild(knot);
+  let jerk=0;
+  function pulse(dir){ jerk += dir*14; }
+  function frame(ms){
+    const t=ms*0.001, p=(typeof pos==="number")?pos:0, w=(S&&S.win)?S.win:8;
+    const shift=(p/w)*WIN_PX+jerk; jerk*=0.86; if(Math.abs(jerk)<0.3) jerk=0;
+    knot.setAttribute("transform","translate("+(CENTER+shift)+",0)");
+    kids.forEach(k=>{
+      const adv=k.dir>0?-p/w:p/w, lean=-8-11*Math.max(-0.4,adv), sway=1.2*Math.sin(t*1.8+k.ph), tx=shift*0.2;
+      k.o.setAttribute("transform","translate("+(k.bx+tx)+","+GROUND+") scale("+k.dir+",1) rotate("+(lean+sway)+")");
+    });
+    const d="M130 "+ROPEY+" Q"+(CENTER+shift)+" "+(ROPEY+12)+" 870 "+ROPEY;
+    rope.setAttribute("d",d); rope2.setAttribute("d",d);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  return {pulse};
+})();
+function layoutStage(){}   // SVG o'zi moslashadi
 
 // ---------- Holat ----------
 let state="setup", pos=0, endAt=0, remain=0, timerId=null;
@@ -335,11 +395,11 @@ function lockTeam(t,ms,text){
 // ---------- Arqon ----------
 function pull(t){
   pos+=t===0?-1:1;
+  SCENE.pulse(t===0?-1:1);
   drawRope();
   if(Math.abs(pos)>=S.win) finish(t);
 }
 function drawRope(){
-  $("photo").style.transform=`translateX(${pos/S.win*maxShift}px)`;
   $("scA").textContent=T[0].ok; $("scB").textContent=T[1].ok;
   const st=$("status");
   if(pos<0){ st.textContent=`◀ ${S.names[0]} oldinda`; st.style.color="var(--L)"; }
@@ -443,5 +503,6 @@ document.addEventListener("visibilitychange",()=>{ if(document.hidden) pause(); 
 
 renderSetup(); soundIcon();
 </script>
+<script>if('serviceWorker'in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
 </body>
 </html>

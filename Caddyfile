@@ -25,9 +25,8 @@
 		-Server
 	}
 
-	# "Tez kunda" bo'limlari: hozircha bosh sahifaga qaytaradi
-	redir /sinf-daftari* / 302
-	redir /reyting* / 302
+	# Service worker har doim yangilanishi uchun keshlanmasin (eski versiyada qotib qolmasin)
+	header /sw.js Cache-Control "no-cache"
 
 	root * .
 	encode gzip zstd
