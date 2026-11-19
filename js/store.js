@@ -167,6 +167,21 @@
   //  CLOUD rejim (Supabase)
   // =====================================================================
   let sb=null, profile=null;
+  // Supabase kutubxonasi faqat kerak bo'lganda (ball yozish/kirish) yuklanadi —
+  // shunda o'yinlar bir zumda ochiladi va internet bo'lmasa ham ishlayveradi.
+  const SB_SRC="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js";
+  let sbLoading=null;
+  function ensureSb(){
+    if(window.supabase) return Promise.resolve(true);
+    if(typeof document==="undefined") return Promise.resolve(false);
+    if(!sbLoading) sbLoading=new Promise(res=>{
+      const s=document.createElement("script"); s.src=SB_SRC; s.async=true;
+      s.onload=()=>res(!!window.supabase);
+      s.onerror=()=>{ sbLoading=null; res(false); };
+      document.head.appendChild(s);
+    });
+    return sbLoading;
+  }
   const QKEY="aqlli-queue", CKEY="aqlli-cache";
   const cache={ get(k){ return (LS.get(CKEY,{})||{})[k]; }, set(k,v){ const c=LS.get(CKEY,{})||{}; c[k]=v; LS.set(CKEY,c); } };
   function isNetErr(e){ return !e || /fetch|network|Failed|timeout|offline/i.test(String(e.message||e)) || e.status===0; }
@@ -198,6 +213,7 @@
 
   const cloud={
     async ready(){
+      await ensureSb();
       if(!window.supabase) return {mode:"cloud", offline:true, needLogin:false, role:LS.get("aqlli-role",null)};
       sb=sb||window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{persistSession:true}});
       const {data:{session}}=await sb.auth.getSession();
@@ -211,6 +227,7 @@
       return {mode:"cloud", needLogin:false, role:profile.role, name:profile.full_name};
     },
     async login(email,password){
+      if(!await ensureSb()) throw new Error("Internet yo'q — kirish uchun ulanishni tekshiring");
       sb=sb||window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{persistSession:true}});
       const {error}=await sb.auth.signInWithPassword({email,password});
       if(error) throw new Error(error.message==="Invalid login credentials"?"Email yoki parol noto'g'ri":error.message);

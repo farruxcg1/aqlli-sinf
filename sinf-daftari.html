@@ -136,7 +136,6 @@
 
 <canvas id="confetti"></canvas>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js"></script>
 <script src="js/config.js"></script>
 <script src="js/store.js"></script>
 <script src="js/ui.js"></script>
@@ -282,5 +281,6 @@ function confetti(){
   let tm; S.onChange(()=>{ clearTimeout(tm); tm=setTimeout(load,400); });
 })();
 </script>
+<script>if('serviceWorker'in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
 </body>
 </html>

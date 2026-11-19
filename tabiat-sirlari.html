@@ -432,5 +432,6 @@ function soundIcon(){ $("btnSound").textContent=S.sound?"🔊":"🔇"; }
 $("btnSound").onclick=()=>{ S.sound=!S.sound; save(); soundIcon(); };
 renderSetup(); soundIcon();
 </script>
+<script>if('serviceWorker'in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
 </body>
 </html>

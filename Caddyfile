@@ -25,6 +25,9 @@
 		-Server
 	}
 
+	# Service worker har doim yangilanishi uchun keshlanmasin (eski versiyada qotib qolmasin)
+	header /sw.js Cache-Control "no-cache"
+
 	# "Tez kunda" bo'limlari: hozircha bosh sahifaga qaytaradi
 	redir /sinf-daftari* / 302
 	redir /reyting* / 302

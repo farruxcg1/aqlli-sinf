@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taymer — Aqlli sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101a33; --panel:#1a2747; --panel2:#24345c; --line:#33467a;
+    --text:#f4f6ff; --muted:#a9b4d6;
+    --yellow:#ffc53d; --teal:#2fd3b5; --coral:#ff6b5e; --green:#3ddc84; --bad:#ff4d4d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:Nunito,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  header{display:flex;align-items:center;gap:14px;padding:10px 20px;flex-wrap:wrap}
+  header h1{font-size:clamp(22px,2.4vw,38px);font-weight:900}
+  header h1 span{color:var(--yellow)}
+  .spacer{flex:1}
+  .iconbtn{width:58px;height:58px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:26px;display:grid;place-items:center;text-decoration:none;color:inherit}
+  .iconbtn:active{transform:scale(.95)}
+  .tabs{display:flex;gap:10px;padding:0 20px 8px}
+  .tab{flex:1;max-width:320px;min-height:56px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:clamp(16px,1.5vw,22px);font-weight:900;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:10px}
+  .tab.on{background:var(--yellow);color:#1b1b1b;border-color:#e0a920}
+
+  main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,2vh,26px);padding:0 16px 10px}
+  .dial{position:relative;width:min(62vh,92vw);aspect-ratio:1;display:grid;place-items:center}
+  .dial svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+  .ring-bg{fill:none;stroke:var(--panel);stroke-width:14}
+  .ring-fg{fill:none;stroke:var(--teal);stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset .25s linear,stroke .3s}
+  .time{font-size:min(20vh,26vw);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:2px;z-index:1}
+  .time small{font-size:.42em;color:var(--muted)}
+  .dial.hurry .time{color:var(--bad)}
+  .dial.hurry .ring-fg{stroke:var(--bad)}
+  .dial.done{animation:flash 1s step-start infinite}
+  @keyframes flash{50%{background:rgba(255,77,77,.18);border-radius:50%}}
+  .label{font-size:clamp(20px,2.4vw,40px);font-weight:900;color:var(--muted);min-height:1.2em;text-align:center}
+  .label.done{color:var(--bad)}
+
+  .presets{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .preset{min-width:74px;height:58px;padding:0 18px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-size:clamp(17px,1.6vw,24px);font-weight:900;color:var(--muted)}
+  .preset.on{background:var(--yellow);color:#1b1b1b;border-color:#e0a920}
+  .adjust{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .adj{min-width:78px;height:56px;padding:0 14px;border-radius:14px;background:var(--panel2);border:2px solid var(--line);font-size:clamp(16px,1.5vw,22px);font-weight:900}
+  .adj:active{transform:translateY(3px)}
+
+  .controls{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  .btn{min-height:76px;padding:0 44px;border-radius:24px;font-size:clamp(20px,2.2vw,34px);font-weight:900;display:inline-flex;align-items:center;gap:12px;background:var(--panel2);border:3px solid var(--line);box-shadow:0 6px 0 rgba(0,0,0,.35)}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+  .btn.main{background:var(--green);color:#06331a;border-color:#24b765}
+  .btn.warn{background:var(--yellow);color:#1b1b1b;border-color:#e0a920}
+  .btn[hidden]{display:none}
+  section[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="iconbtn" href="index.html" title="Bosh sahifa">🏠</a>
+    <h1>Tay<span>mer</span></h1>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="btnSound" title="Ovoz">🔊</button>
+    <button class="iconbtn" id="btnFull" title="To'liq ekran">⛶</button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" id="tabDown">⏳ Taymer</button>
+    <button class="tab" id="tabUp">⏱️ Sekundomer</button>
+  </div>
+
+  <!-- Teskari sanash -->
+  <main id="down">
+    <div class="dial" id="dial">
+      <svg viewBox="0 0 240 240"><circle class="ring-bg" cx="120" cy="120" r="110"/><circle class="ring-fg" id="ring" cx="120" cy="120" r="110"/></svg>
+      <div class="time" id="dTime">5:00</div>
+    </div>
+    <div class="label" id="dLabel"></div>
+    <div class="presets" id="presets"></div>
+    <div class="adjust" id="adjust"></div>
+    <div class="controls">
+      <button class="btn main" id="dStart">▶ Boshlash</button>
+      <button class="btn warn" id="dPause" hidden>⏸️ To'xtatish</button>
+      <button class="btn" id="dReset">↺ Qaytadan</button>
+    </div>
+  </main>
+
+  <!-- Sekundomer -->
+  <main id="up" hidden>
+    <div class="dial"><div class="time" id="uTime">0:00<small id="uCs">.00</small></div></div>
+    <div class="label"></div>
+    <div class="controls">
+      <button class="btn main" id="uStart">▶ Boshlash</button>
+      <button class="btn warn" id="uPause" hidden>⏸️ To'xtatish</button>
+      <button class="btn" id="uReset">↺ Qaytadan</button>
+    </div>
+  </main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const RING_C=2*Math.PI*110;
+$("ring").style.strokeDasharray=RING_C;
+
+// ---------- Sozlamalar ----------
+let sound=true, total=300000; // ms
+try{ const d=JSON.parse(localStorage.getItem("aqlli-taymer")||"{}"); if(typeof d.sound==="boolean")sound=d.sound; if(d.total)total=d.total; }catch(e){}
+const save=()=>{ try{ localStorage.setItem("aqlli-taymer",JSON.stringify({sound,total})); }catch(e){} };
+
+// ---------- Ovoz ----------
+let AC=null;
+function tone(f,d=.15,type="sine",v=.2,w=0){
+  if(!sound) return;
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+  const t=AC.currentTime+w,o=AC.createOscillator(),g=AC.createGain();
+  o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02);
+}
+const beepEnd=()=>[880,880,1047,1319].forEach((f,i)=>tone(f,.35,"square",.25,i*.25));
+
+function fmt(ms){
+  const s=Math.max(0,Math.ceil(ms/1000)), h=Math.floor(s/3600), m=Math.floor(s%3600/60), ss=s%60;
+  return h>0 ? `${h}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}` : `${m}:${String(ss).padStart(2,"0")}`;
+}
+
+// ==================== Teskari sanash ====================
+let dState="idle", remain=total, endAt=0, rafD=0, lastBeep=-1;
+const PRESETS=[30,60,120,180,300,600,900]; // soniya
+
+function renderPresets(){
+  $("presets").innerHTML="";
+  PRESETS.forEach(sec=>{
+    const b=document.createElement("button"); b.className="preset"+(total===sec*1000?" on":"");
+    b.textContent=sec<60?sec+" s":(sec/60)+" daq";
+    b.onclick=()=>{ if(dState==="run")return; total=sec*1000; remain=total; save(); renderPresets(); drawDown(); };
+    $("presets").appendChild(b);
+  });
+  $("adjust").innerHTML="";
+  [["−1:00",-60],["−0:10",-10],["+0:10",10],["+1:00",60]].forEach(([t,sec])=>{
+    const b=document.createElement("button"); b.className="adj"; b.textContent=t;
+    b.onclick=()=>{ if(dState==="run")return; total=Math.max(10000,Math.min(5400000,total+sec*1000)); remain=total; save(); renderPresets(); drawDown(); };
+    $("adjust").appendChild(b);
+  });
+}
+function drawDown(){
+  $("dTime").textContent=fmt(remain);
+  const frac=total>0?Math.max(0,remain/total):0;
+  $("ring").style.strokeDashoffset=RING_C*(1-frac);
+  const hurry=dState==="run"&&remain<=10000&&remain>0;
+  $("dial").classList.toggle("hurry",hurry);
+}
+function tickDown(){
+  if(dState!=="run") return;
+  remain=Math.max(0,endAt-performance.now());
+  const s=Math.ceil(remain/1000);
+  if(s<=5&&s>0&&s!==lastBeep){ tone(900,.08,"square",.15); lastBeep=s; }
+  drawDown();
+  if(remain<=0){ finishDown(); return; }
+  rafD=requestAnimationFrame(tickDown);
+}
+function startDown(){
+  if(dState==="run"||remain<=0) { if(remain<=0){ remain=total; } }
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  dState="run"; endAt=performance.now()+remain; lastBeep=-1;
+  $("dStart").hidden=true; $("dPause").hidden=false; $("dLabel").textContent=""; $("dial").classList.remove("done");
+  $("dLabel").classList.remove("done");
+  cancelAnimationFrame(rafD); tickDown();
+}
+function pauseDown(){
+  if(dState!=="run") return;
+  dState="paused"; remain=Math.max(0,endAt-performance.now()); cancelAnimationFrame(rafD);
+  $("dStart").hidden=false; $("dStart").textContent="▶ Davom etish"; $("dPause").hidden=true; drawDown();
+}
+function resetDown(){
+  dState="idle"; cancelAnimationFrame(rafD); remain=total;
+  $("dStart").hidden=false; $("dStart").textContent="▶ Boshlash"; $("dPause").hidden=true;
+  $("dial").classList.remove("hurry","done"); $("dLabel").textContent=""; $("dLabel").classList.remove("done");
+  drawDown();
+}
+function finishDown(){
+  dState="done"; cancelAnimationFrame(rafD); remain=0; drawDown();
+  $("dStart").hidden=false; $("dStart").textContent="🔁 Qaytadan"; $("dPause").hidden=true;
+  $("dial").classList.add("done"); const l=$("dLabel"); l.textContent="⏰ Vaqt tugadi!"; l.classList.add("done");
+  beepEnd();
+}
+$("dStart").onclick=()=>{ if(dState==="done"){ resetDown(); startDown(); } else startDown(); };
+$("dPause").onclick=pauseDown;
+$("dReset").onclick=resetDown;
+
+// ==================== Sekundomer ====================
+let uState="idle", uElapsed=0, uStart=0, rafU=0;
+function drawUp(){
+  const s=Math.floor(uElapsed/1000), cs=Math.floor(uElapsed%1000/10);
+  const h=Math.floor(s/3600), m=Math.floor(s%3600/60), ss=s%60;
+  $("uTime").firstChild.textContent = h>0 ? `${h}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}` : `${m}:${String(ss).padStart(2,"0")}`;
+  $("uCs").textContent="."+String(cs).padStart(2,"0");
+}
+function tickUp(){ if(uState!=="run")return; uElapsed=performance.now()-uStart; drawUp(); rafU=requestAnimationFrame(tickUp); }
+function startUp(){ uState="run"; uStart=performance.now()-uElapsed; $("uStart").hidden=true; $("uPause").hidden=false; tickUp(); }
+function pauseUp(){ if(uState!=="run")return; uState="paused"; uElapsed=performance.now()-uStart; cancelAnimationFrame(rafU); $("uStart").hidden=false; $("uStart").textContent="▶ Davom etish"; $("uPause").hidden=true; }
+function resetUp(){ uState="idle"; cancelAnimationFrame(rafU); uElapsed=0; $("uStart").hidden=false; $("uStart").textContent="▶ Boshlash"; $("uPause").hidden=true; drawUp(); }
+$("uStart").onclick=()=>{ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} startUp(); };
+$("uPause").onclick=pauseUp;
+$("uReset").onclick=resetUp;
+
+// ==================== Umumiy ====================
+function tab(down){
+  $("tabDown").classList.toggle("on",down); $("tabUp").classList.toggle("on",!down);
+  $("down").hidden=!down; $("up").hidden=down;
+}
+$("tabDown").onclick=()=>tab(true);
+$("tabUp").onclick=()=>tab(false);
+function soundIcon(){ $("btnSound").textContent=sound?"🔊":"🔇"; }
+$("btnSound").onclick=()=>{ sound=!sound; save(); soundIcon(); };
+$("btnFull").onclick=()=>{ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{}); };
+addEventListener("keydown",e=>{
+  if(e.code==="Space"){ e.preventDefault();
+    if(!$("down").hidden){ dState==="run"?pauseDown():$("dStart").click(); }
+    else { uState==="run"?pauseUp():startUp(); }
+  }
+});
+
+renderPresets(); drawDown(); drawUp(); soundIcon();
+</script>
+<script>if('serviceWorker'in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
+</body>
+</html>
